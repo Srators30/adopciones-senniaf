@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Crear usuario | SENNIAF</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/crear-usuario.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">SENNIAF <small>Sistema de gestión de adopciones</small></div>
+    <div class="user">
+      <strong id="sesion-nombre">—</strong>
+      <span><span id="sesion-rol">—</span> · <a href="#" id="btn-salir" style="color:inherit">Cerrar sesión</a></span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="page-head">
+    <h1>Crear usuario</h1>
+    <p>Da acceso al sistema a una persona autorizada de SENNIAF o del órgano judicial. Verifica su identidad antes de continuar.</p>
+  </div>
+
+  <div class="banner banner-info" role="status" id="banner-creado" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B4B9B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+    <span id="banner-creado-text">Usuario creado correctamente.</span>
+  </div>
+  <div class="banner banner-error" role="alert" id="banner-error" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+    <span id="banner-error-text"></span>
+  </div>
+
+  <div class="banner banner-info" role="note">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B4B9B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    <span>Las cuentas no se crean por autoservicio. Solo un Administrador puede dar de alta a una persona usuaria, y la acción queda registrada con tu nombre y la fecha.</span>
+  </div>
+
+  <div id="resumen-errores" role="alert" tabindex="-1" hidden>
+    <h2>Revisa estos campos antes de guardar</h2>
+    <ul></ul>
+  </div>
+
+  <form id="form-usuario" autocomplete="off" novalidate>
+
+    <section class="sec">
+      <h2>Datos de la persona</h2>
+      <p class="lead">Con estos datos identificarás la cuenta dentro del sistema.</p>
+      <div class="grid">
+        <div class="field full">
+          <label for="nombre_completo">Nombre completo <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="nombre_completo" name="nombre_completo" required maxlength="120" aria-describedby="e-nombre_completo">
+          <p class="error" id="e-nombre_completo"></p>
+        </div>
+        <div class="field full">
+          <label for="username">Usuario <span class="req" aria-hidden="true">*</span></label>
+          <p class="hint" id="h-username">Sin espacios. Solo letras, números, puntos y guion bajo. Ejemplo: maria.gonzalez</p>
+          <input type="text" id="username" name="username" required minlength="4" maxlength="40" autocomplete="off" aria-describedby="h-username e-username">
+          <p class="error" id="e-username"></p>
+        </div>
+
+        <fieldset class="field full">
+          <legend>Rol <span class="req" aria-hidden="true">*</span></legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="rol" value="ADMINISTRADOR" required> Administrador</label>
+            <label class="choice"><input type="radio" name="rol" value="TECNICO"> Técnico/Trabajador</label>
+            <label class="choice"><input type="radio" name="rol" value="JUEZ"> Juez / usuario jurídico</label>
+          </div>
+          <p class="error" id="e-rol"></p>
+        </fieldset>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>Contraseña temporal</h2>
+      <p class="lead">La persona podrá cambiarla la primera vez que inicie sesión.</p>
+      <div class="grid">
+        <div class="field">
+          <label for="password">Contraseña <span class="req" aria-hidden="true">*</span></label>
+          <div class="password-field">
+            <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password" aria-describedby="h-password e-password">
+            <button type="button" class="password-toggle" data-target="password" aria-label="Mostrar contraseña" aria-pressed="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="strength" id="strength-bar" data-level="0" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <p class="strength-label" id="h-password">Mínimo 8 caracteres, con mayúscula, número y símbolo.</p>
+          <p class="error" id="e-password"></p>
+        </div>
+        <div class="field">
+          <label for="password_confirmar">Confirmar contraseña <span class="req" aria-hidden="true">*</span></label>
+          <div class="password-field">
+            <input type="password" id="password_confirmar" name="password_confirmar" required autocomplete="new-password" aria-describedby="e-password_confirmar">
+            <button type="button" class="password-toggle" data-target="password_confirmar" aria-label="Mostrar contraseña" aria-pressed="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <p class="error" id="e-password_confirmar"></p>
+        </div>
+
+        <fieldset class="field full">
+          <legend>Estado de la cuenta</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="estado" value="activo" checked> Activa desde ahora</label>
+            <label class="choice"><input type="radio" name="estado" value="inactivo"> Creada pero inactiva</label>
+          </div>
+        </fieldset>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>Confirmación</h2>
+      <div class="grid">
+        <div class="field full">
+          <label class="check" for="declaracion_verificacion">
+            <input type="checkbox" id="declaracion_verificacion" name="declaracion_verificacion" value="1" required aria-describedby="e-declaracion_verificacion">
+            <span>Verifiqué la identidad y el cargo de esta persona antes de crear su cuenta. <span class="req" aria-hidden="true">*</span></span>
+          </label>
+          <p class="error" id="e-declaracion_verificacion"></p>
+        </div>
+        <div class="field full aviso">
+          Al guardar, el sistema registrará tu usuario y la fecha como responsables de esta alta, tal como exige la trazabilidad del sistema.
+        </div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <a class="btn btn-secondary" href="usuarios.php">Cancelar</a>
+      <button type="submit" class="btn btn-primary" id="btn-guardar">Crear usuario</button>
+    </div>
+  </form>
+</main>
+
+<script src="js/sesion.js"></script>
+<script src="js/crear-usuario.js"></script>
+<script src="js/usuario-api.js"></script>
+</body>
+</html>

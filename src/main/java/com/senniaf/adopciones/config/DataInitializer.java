@@ -9,9 +9,12 @@ import org.springframework.stereotype.Component;
 
 /**
  * Crea usuarios de ejemplo (uno por rol) al iniciar la aplicacion, unicamente
- * si no existen todavia. Util para pruebas manuales en Postman/Swagger y para
- * las pruebas de integracion. En un entorno real este mecanismo se reemplaza
- * por un modulo de administracion de usuarios.
+ * si no existen todavia. Util para pruebas manuales en Postman/Swagger, para
+ * el frontend PHP y para las pruebas de integracion.
+ *
+ * Los usuarios que se creen desde la pantalla "Crear usuario" se suman a
+ * estos. Como la base H2 es en memoria, se pierden al reiniciar: eso se
+ * resuelve al migrar a PostgreSQL.
  */
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -26,14 +29,14 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        crearSiNoExiste("admin", "Admin123!", Rol.ADMINISTRADOR);
-        crearSiNoExiste("tecnico1", "Tecnico123!", Rol.TECNICO);
-        crearSiNoExiste("juez1", "Juez123!", Rol.JUEZ);
+        crearSiNoExiste("admin", "Admin123!", Rol.ADMINISTRADOR, "Administrador General");
+        crearSiNoExiste("tecnico1", "Tecnico123!", Rol.TECNICO, "Tecnico de Ejemplo");
+        crearSiNoExiste("juez1", "Juez123!", Rol.JUEZ, "Juez de Ejemplo");
     }
 
-    private void crearSiNoExiste(String username, String passwordSinHashear, Rol rol) {
+    private void crearSiNoExiste(String username, String passwordSinHashear, Rol rol, String nombreCompleto) {
         usuarioRepository.findByUsername(username).orElseGet(() -> {
-            Usuario usuario = new Usuario(username, passwordEncoder.encode(passwordSinHashear), rol);
+            Usuario usuario = new Usuario(username, passwordEncoder.encode(passwordSinHashear), rol, nombreCompleto);
             return usuarioRepository.save(usuario);
         });
     }

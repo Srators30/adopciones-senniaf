@@ -1,0 +1,45 @@
+/* =====================================================================
+   SENNIAF · documentos.css  (HU-04)
+   Bloque de documentos dentro de la ficha del expediente. Usa los
+   tokens de base.css; aquí solo va lo propio de esta sección.
+   ===================================================================== */
+
+.subida {
+  display: grid; grid-template-columns: 1fr 1fr auto; gap: 14px; align-items: end;
+  padding: 18px; background: var(--paper); border: 1px dashed var(--line);
+  border-radius: 8px; margin-bottom: 20px;
+}
+.subida label { display: block; font-weight: 700; font-size: .875rem; margin-bottom: 4px; }
+.subida input[type=file] {
+  width: 100%; min-height: 46px; padding: 9px 12px; font: inherit;
+  background: #fff; border: 1.5px solid #8793A8; border-radius: 6px;
+}
+.subida .btn { min-height: 46px; }
+.reglas { margin: 10px 0 0; font-size: .8125rem; color: var(--muted); grid-column: 1 / -1; }
+
+ul.documentos { list-style: none; margin: 0; padding: 0; }
+ul.documentos li {
+  display: grid; grid-template-columns: 40px 1fr auto; gap: 14px; align-items: center;
+  padding: 14px 0; border-bottom: 1px solid var(--line);
+}
+ul.documentos li:last-child { border-bottom: 0; padding-bottom: 0; }
+.doc-icono {
+  width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center;
+  background: var(--blue-tint); color: var(--blue-dark); font-size: .6875rem; font-weight: 700;
+}
+.doc-datos { min-width: 0; }
+.doc-datos strong { display: block; overflow-wrap: anywhere; }
+.doc-datos span { font-size: .8125rem; color: var(--muted); }
+.doc-hash {
+  font-family: ui-monospace, Consolas, monospace; font-size: .6875rem; color: var(--muted);
+  overflow-wrap: anywhere; display: block; margin-top: 2px;
+}
+ul.documentos .btn { min-height: 40px; padding: 0 16px; font-size: .9375rem; }
+
+.sin-documentos { padding: 24px 0; color: var(--muted); }
+
+@media (max-width: 640px) {
+  .subida { grid-template-columns: 1fr; }
+  ul.documentos li { grid-template-columns: 40px 1fr; }
+  ul.documentos .btn { grid-column: 2; justify-self: start; }
+}

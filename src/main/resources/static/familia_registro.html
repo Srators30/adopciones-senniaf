@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Registrar familia solicitante | SENNIAF</title>
+
+<!--
+  =====================================================================
+  SENNIAF · HU-05 · Registro de familias solicitantes
+
+  Seis secciones, el mismo orden en que se levanta la información en
+  una entrevista: quién solicita, con quién, dónde vive, de qué vive,
+  a quién podría acoger y qué declara.
+
+  NO se piden aquí (los asigna el servidor): número de solicitud,
+  estado inicial, fecha y usuario responsable.
+
+  Tampoco se pide el monto exacto del ingreso: para evaluar basta el
+  tramo, y guardar menos es la regla de la Ley 81 de 2019.
+
+  Los campos ocultos se deshabilitan, por eso no viajan en el envío.
+  =====================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/expedientes.css">
+<link rel="stylesheet" href="css/familias.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">SENNIAF <small>Sistema de gestión de adopciones</small></div>
+    <div class="user">
+      <strong id="sesion-nombre">—</strong>
+      <span><span id="sesion-rol">—</span> · <a href="#" id="btn-salir" style="color:inherit">Cerrar sesión</a></span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="page-head">
+    <div>
+      <h1>Registrar familia solicitante</h1>
+      <p>Datos de quienes solicitan una adopción o un acogimiento familiar. Los campos marcados con <span class="req" aria-hidden="true">*</span> son obligatorios.</p>
+    </div>
+  </div>
+
+  <div class="banner banner-info" role="status" id="banner-creada" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B4B9B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+    <span>Solicitud <strong id="numero-creado"></strong> registrada correctamente.</span>
+  </div>
+  <div class="banner banner-error" role="alert" id="banner-error" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+    <span id="banner-error-text"></span>
+  </div>
+
+  <form id="form-familia" class="form-familia" novalidate autocomplete="off">
+
+    <!-- 1. SOLICITANTE PRINCIPAL -->
+    <section class="sec">
+      <h2><span class="n" aria-hidden="true">1</span> Solicitante principal</h2>
+      <p class="sec-nota">La persona que encabeza la solicitud. Debe ser mayor de edad.</p>
+      <div class="rejilla">
+        <div class="field">
+          <label for="nombres">Nombres <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="nombres" name="nombres" required maxlength="80">
+          <p class="error" id="e-nombres"></p>
+        </div>
+        <div class="field">
+          <label for="apellidos">Apellidos <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="apellidos" name="apellidos" required maxlength="80">
+          <p class="error" id="e-apellidos"></p>
+        </div>
+        <div class="field">
+          <label for="fecha_nacimiento">Fecha de nacimiento <span class="req" aria-hidden="true">*</span></label>
+          <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+          <p class="hint" id="edad-out">—</p>
+          <p class="error" id="e-fecha_nacimiento"></p>
+        </div>
+        <div class="field">
+          <label for="tipo_documento">Tipo de documento <span class="req" aria-hidden="true">*</span></label>
+          <select id="tipo_documento" name="tipo_documento" required>
+            <option value="">Selecciona</option>
+            <option value="cedula">Cédula de identidad personal</option>
+            <option value="pasaporte">Pasaporte</option>
+            <option value="carne_residente">Carné de residente</option>
+          </select>
+          <p class="error" id="e-tipo_documento"></p>
+        </div>
+        <div class="field">
+          <label for="numero_documento">Número de documento <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="numero_documento" name="numero_documento" required maxlength="40">
+          <p class="error" id="e-numero_documento"></p>
+        </div>
+        <div class="field">
+          <label for="ocupacion">Ocupación <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="ocupacion" name="ocupacion" required maxlength="80">
+          <p class="error" id="e-ocupacion"></p>
+        </div>
+        <div class="field">
+          <label for="telefono">Teléfono <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="telefono" name="telefono" required maxlength="40" placeholder="6000-0000">
+          <p class="error" id="e-telefono"></p>
+        </div>
+        <div class="field medio">
+          <label for="correo">Correo electrónico</label>
+          <input type="email" id="correo" name="correo" maxlength="120">
+          <p class="error" id="e-correo"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. SEGUNDO SOLICITANTE -->
+    <section class="sec">
+      <h2><span class="n" aria-hidden="true">2</span> Segundo solicitante</h2>
+      <p class="sec-nota">Una familia solicitante puede ser de una sola persona. Si son dos, sus datos son obligatorios.</p>
+      <div class="rejilla">
+        <div class="field">
+          <label for="tiene_segundo">¿Hay un segundo solicitante? <span class="req" aria-hidden="true">*</span></label>
+          <select id="tiene_segundo" name="tiene_segundo" required>
+            <option value="">Selecciona</option>
+            <option value="no">No, solicita una sola persona</option>
+            <option value="si">Sí, son dos solicitantes</option>
+          </select>
+          <p class="error" id="e-tiene_segundo"></p>
+        </div>
+      </div>
+
+      <div class="rejilla" id="g-segundo" style="margin-top:16px" hidden>
+        <div class="field">
+          <label for="segundo_nombres">Nombres <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="segundo_nombres" name="segundo_nombres" maxlength="80">
+          <p class="error" id="e-segundo_nombres"></p>
+        </div>
+        <div class="field">
+          <label for="segundo_apellidos">Apellidos <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="segundo_apellidos" name="segundo_apellidos" maxlength="80">
+          <p class="error" id="e-segundo_apellidos"></p>
+        </div>
+        <div class="field">
+          <label for="segundo_fecha_nacimiento">Fecha de nacimiento <span class="req" aria-hidden="true">*</span></label>
+          <input type="date" id="segundo_fecha_nacimiento" name="segundo_fecha_nacimiento">
+          <p class="error" id="e-segundo_fecha_nacimiento"></p>
+        </div>
+        <div class="field">
+          <label for="segundo_tipo_documento">Tipo de documento <span class="req" aria-hidden="true">*</span></label>
+          <select id="segundo_tipo_documento" name="segundo_tipo_documento">
+            <option value="">Selecciona</option>
+            <option value="cedula">Cédula de identidad personal</option>
+            <option value="pasaporte">Pasaporte</option>
+            <option value="carne_residente">Carné de residente</option>
+          </select>
+          <p class="error" id="e-segundo_tipo_documento"></p>
+        </div>
+        <div class="field">
+          <label for="segundo_numero_documento">Número de documento <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="segundo_numero_documento" name="segundo_numero_documento" maxlength="40">
+          <p class="error" id="e-segundo_numero_documento"></p>
+        </div>
+        <div class="field">
+          <label for="segundo_ocupacion">Ocupación</label>
+          <input type="text" id="segundo_ocupacion" name="segundo_ocupacion" maxlength="80">
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. HOGAR Y VIVIENDA -->
+    <section class="sec">
+      <h2><span class="n" aria-hidden="true">3</span> Hogar y vivienda</h2>
+      <p class="sec-nota">Dónde y con quién viviría el menor.</p>
+      <div class="rejilla">
+        <div class="field">
+          <label for="estado_civil">Estado civil <span class="req" aria-hidden="true">*</span></label>
+          <select id="estado_civil" name="estado_civil" required>
+            <option value="">Selecciona</option>
+            <option value="soltero">Soltero(a)</option>
+            <option value="casado">Casado(a)</option>
+            <option value="union_de_hecho">Unión de hecho</option>
+            <option value="divorciado">Divorciado(a)</option>
+            <option value="viudo">Viudo(a)</option>
+          </select>
+          <p class="error" id="e-estado_civil"></p>
+        </div>
+        <div class="field">
+          <label for="anios_convivencia">Años de convivencia</label>
+          <input type="number" id="anios_convivencia" name="anios_convivencia" min="0" max="80" step="1">
+        </div>
+        <div class="field">
+          <label for="tipo_vivienda">Tipo de vivienda <span class="req" aria-hidden="true">*</span></label>
+          <select id="tipo_vivienda" name="tipo_vivienda" required>
+            <option value="">Selecciona</option>
+            <option value="propia">Propia</option>
+            <option value="alquilada">Alquilada</option>
+            <option value="familiar">Cedida por un familiar</option>
+            <option value="otra">Otra</option>
+          </select>
+          <p class="error" id="e-tipo_vivienda"></p>
+        </div>
+
+        <!-- Lista cerrada: antes esto se escribía a mano -->
+        <div class="field">
+          <label for="provincia_residencia">Provincia <span class="req" aria-hidden="true">*</span></label>
+          <select id="provincia_residencia" name="provincia_residencia" required
+                  data-provincia="distrito_residencia">
+            <option value="">Selecciona una provincia</option>
+          </select>
+          <p class="error" id="e-provincia_residencia"></p>
+        </div>
+        <div class="field">
+          <label for="distrito_residencia">Distrito <span class="req" aria-hidden="true">*</span></label>
+          <select id="distrito_residencia" name="distrito_residencia" required disabled>
+            <option value="">Elige primero la provincia</option>
+          </select>
+          <p class="error" id="e-distrito_residencia"></p>
+        </div>
+        <div class="field">
+          <label for="corregimiento_residencia">Corregimiento</label>
+          <input type="text" id="corregimiento_residencia" name="corregimiento_residencia" maxlength="60">
+        </div>
+
+        <div class="field full">
+          <label for="direccion">Dirección exacta <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="direccion" name="direccion" required maxlength="400" style="min-height:72px"></textarea>
+          <p class="error" id="e-direccion"></p>
+        </div>
+
+        <div class="field">
+          <label for="habitaciones">Habitaciones <span class="req" aria-hidden="true">*</span></label>
+          <input type="number" id="habitaciones" name="habitaciones" required min="1" max="30" step="1">
+          <p class="error" id="e-habitaciones"></p>
+        </div>
+        <div class="field">
+          <label for="personas_hogar">Personas en el hogar <span class="req" aria-hidden="true">*</span></label>
+          <input type="number" id="personas_hogar" name="personas_hogar" required min="1" max="30" step="1">
+          <p class="error" id="e-personas_hogar"></p>
+        </div>
+        <div class="field">
+          <label for="tiene_hijos">¿Tienen hijos? <span class="req" aria-hidden="true">*</span></label>
+          <select id="tiene_hijos" name="tiene_hijos" required>
+            <option value="">Selecciona</option>
+            <option value="no">No</option>
+            <option value="si">Sí</option>
+          </select>
+          <p class="error" id="e-tiene_hijos"></p>
+        </div>
+        <div class="field" id="g-hijos" hidden>
+          <label for="hijos_cantidad">¿Cuántos? <span class="req" aria-hidden="true">*</span></label>
+          <input type="number" id="hijos_cantidad" name="hijos_cantidad" min="1" max="20" step="1">
+          <p class="error" id="e-hijos_cantidad"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. SITUACIÓN SOCIOECONÓMICA -->
+    <section class="sec">
+      <h2><span class="n" aria-hidden="true">4</span> Situación socioeconómica</h2>
+      <p class="sec-nota">Solo el tramo de ingreso, no el monto exacto.</p>
+      <div class="aviso-dato">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A5A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <span>El sistema guarda un rango, no la cifra. Para evaluar la solicitud basta con el tramo, y guardar menos datos de los necesarios es lo que pide la Ley 81 de 2019.</span>
+      </div>
+      <div class="rejilla">
+        <div class="field medio">
+          <label for="ingreso_rango">Ingreso mensual del hogar <span class="req" aria-hidden="true">*</span></label>
+          <select id="ingreso_rango" name="ingreso_rango" required>
+            <option value="">Selecciona un rango</option>
+            <option value="hasta_800">Hasta B/. 800</option>
+            <option value="801_1500">B/. 801 a 1,500</option>
+            <option value="1501_2500">B/. 1,501 a 2,500</option>
+            <option value="2501_4000">B/. 2,501 a 4,000</option>
+            <option value="mas_4000">Más de B/. 4,000</option>
+          </select>
+          <p class="error" id="e-ingreso_rango"></p>
+        </div>
+        <div class="field">
+          <label for="fuente_ingreso">Fuente principal <span class="req" aria-hidden="true">*</span></label>
+          <select id="fuente_ingreso" name="fuente_ingreso" required>
+            <option value="">Selecciona</option>
+            <option value="empleo_formal">Empleo formal</option>
+            <option value="independiente">Trabajo independiente</option>
+            <option value="negocio_propio">Negocio propio</option>
+            <option value="jubilacion">Jubilación o pensión</option>
+            <option value="otra">Otra</option>
+          </select>
+          <p class="error" id="e-fuente_ingreso"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. DISPONIBILIDAD DE ACOGIMIENTO -->
+    <section class="sec">
+      <h2><span class="n" aria-hidden="true">5</span> Disponibilidad de acogimiento</h2>
+      <p class="sec-nota">A qué menor podría acoger esta familia. Es lo que permitirá proponer emparejamientos más adelante.</p>
+      <div class="rejilla">
+        <div class="field">
+          <label for="modalidad_solicitada">Modalidad solicitada <span class="req" aria-hidden="true">*</span></label>
+          <select id="modalidad_solicitada" name="modalidad_solicitada" required>
+            <option value="">Selecciona</option>
+            <option value="adopcion">Adopción</option>
+            <option value="acogimiento_familiar">Acogimiento familiar</option>
+          </select>
+          <p class="error" id="e-modalidad_solicitada"></p>
+        </div>
+        <div class="field medio">
+          <label for="edad_minima">Rango de edad que puede acoger <span class="req" aria-hidden="true">*</span></label>
+          <div class="rango">
+            <input type="number" id="edad_minima" name="edad_minima" required min="0" max="17" step="1" aria-label="Edad mínima">
+            <span>a</span>
+            <input type="number" id="edad_maxima" name="edad_maxima" required min="0" max="17" step="1" aria-label="Edad máxima">
+            <span>años</span>
+          </div>
+          <p class="error" id="e-edad_maxima"></p>
+        </div>
+        <div class="field">
+          <label for="sexo_preferencia">Sexo del menor <span class="req" aria-hidden="true">*</span></label>
+          <select id="sexo_preferencia" name="sexo_preferencia" required>
+            <option value="">Selecciona</option>
+            <option value="indistinto">Indistinto</option>
+            <option value="F">Femenino</option>
+            <option value="M">Masculino</option>
+          </select>
+          <p class="error" id="e-sexo_preferencia"></p>
+        </div>
+        <div class="field">
+          <label for="acepta_hermanos">¿Acepta un grupo de hermanos? <span class="req" aria-hidden="true">*</span></label>
+          <select id="acepta_hermanos" name="acepta_hermanos" required>
+            <option value="">Selecciona</option>
+            <option value="si">Sí</option>
+            <option value="no">No</option>
+          </select>
+          <p class="error" id="e-acepta_hermanos"></p>
+        </div>
+        <div class="field">
+          <label for="acepta_necesidades">¿Acepta necesidades especiales? <span class="req" aria-hidden="true">*</span></label>
+          <select id="acepta_necesidades" name="acepta_necesidades" required>
+            <option value="">Selecciona</option>
+            <option value="si">Sí</option>
+            <option value="no">No</option>
+          </select>
+          <p class="error" id="e-acepta_necesidades"></p>
+        </div>
+        <div class="field full" id="g-detalle-aceptacion" hidden>
+          <label for="detalle_aceptacion">¿Cuáles podría atender? <span class="req" aria-hidden="true">*</span></label>
+          <p class="hint">Aceptar en abstracto no sirve para emparejar después: indica qué apoyos puede dar la familia.</p>
+          <textarea id="detalle_aceptacion" name="detalle_aceptacion" maxlength="600"></textarea>
+          <p class="error" id="e-detalle_aceptacion"></p>
+        </div>
+        <div class="field full">
+          <label for="motivacion">Motivación de la solicitud <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="motivacion" name="motivacion" required maxlength="1000"></textarea>
+          <p class="error" id="e-motivacion"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. DECLARACIONES -->
+    <section class="sec">
+      <h2><span class="n" aria-hidden="true">6</span> Declaraciones</h2>
+      <p class="sec-nota">Las tres son obligatorias. Sin ellas el servidor rechaza el registro.</p>
+      <div class="rejilla">
+        <div class="field full">
+          <label class="check" for="declaracion_veracidad">
+            <input type="checkbox" id="declaracion_veracidad" name="declaracion_veracidad" value="1">
+            <span>Los solicitantes declaran que la información entregada es veraz y completa. <span class="req" aria-hidden="true">*</span></span>
+          </label>
+          <p class="error" id="e-declaracion_veracidad"></p>
+        </div>
+        <div class="field full">
+          <label class="check" for="declaracion_requisitos">
+            <input type="checkbox" id="declaracion_requisitos" name="declaracion_requisitos" value="1">
+            <span>Los solicitantes declaran cumplir los requisitos legales para adoptar o acoger, y aceptan la evaluación técnica que corresponda. <span class="req" aria-hidden="true">*</span></span>
+          </label>
+          <p class="error" id="e-declaracion_requisitos"></p>
+        </div>
+        <div class="field full">
+          <label class="check" for="declaracion_trazabilidad">
+            <input type="checkbox" id="declaracion_trazabilidad" name="declaracion_trazabilidad" value="1">
+            <span>Entiendo que el sistema registrará mi usuario, la fecha y la hora como responsables de este registro. <span class="req" aria-hidden="true">*</span></span>
+          </label>
+          <p class="error" id="e-declaracion_trazabilidad"></p>
+        </div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <a class="btn btn-secondary" href="familias.html">Cancelar</a>
+      <button type="submit" class="btn btn-primary" id="btn-guardar">Registrar solicitud</button>
+    </div>
+  </form>
+</main>
+
+<script src="js/sesion.js"></script>
+<script src="js/panama.js"></script>
+<script src="js/familia-registro.js"></script>
+<script src="js/volver-arriba.js"></script>
+</body>
+</html>

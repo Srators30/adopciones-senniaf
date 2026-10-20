@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Ficha de la familia | SENNIAF</title>
+
+<!--
+  =====================================================================
+  SENNIAF · HU-05 · Ficha de la familia solicitante
+  Se abre con ?n=FAM-2026-0001. Los datos salen de
+  GET /api/familias/{n} y el historial de .../historial.
+  Abrir esta página deja constancia: el servidor escribe un evento de
+  tipo CONSULTA con el usuario, su rol y la hora.
+  =====================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/expedientes.css">
+<link rel="stylesheet" href="css/familias.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">SENNIAF <small>Sistema de gestión de adopciones</small></div>
+    <div class="user">
+      <strong id="sesion-nombre">—</strong>
+      <span><span id="sesion-rol">—</span> · <a href="#" id="btn-salir" style="color:inherit">Cerrar sesión</a></span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <p style="margin:0 0 10px"><a href="familias.html" style="color:var(--blue);font-weight:700">← Volver al listado</a></p>
+
+  <div class="banner banner-error" role="alert" id="banner-error" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+    <span id="banner-error-text"></span>
+  </div>
+
+  <div id="contenido" hidden>
+    <div class="page-head">
+      <div>
+        <h1 id="titulo">—</h1>
+        <p>Solicitud <span class="num" id="numero" style="font-family:ui-monospace,Consolas,monospace;font-weight:700">—</span></p>
+      </div>
+
+      <!-- Cambiar el estado es escribir: solo para quien puede -->
+      <div id="control-estado" hidden style="display:flex;gap:8px;align-items:flex-end">
+        <div class="field" style="margin:0">
+          <label for="nuevo-estado" style="font-size:.875rem">Cambiar estado</label>
+          <select id="nuevo-estado" style="min-width:180px">
+            <option value="REGISTRADA">Registrada</option>
+            <option value="EN_EVALUACION">En evaluación</option>
+            <option value="CERRADA">Cerrada</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-estado" style="min-height:46px">Aplicar</button>
+      </div>
+    </div>
+
+    <dl class="cabecera-exp">
+      <div><dt>Estado</dt><dd id="c-estado">—</dd></div>
+      <div><dt>Modalidad solicitada</dt><dd id="c-modalidad">—</dd></div>
+      <div><dt>Edad que puede acoger</dt><dd id="c-rango">—</dd></div>
+      <div><dt>Registrada por</dt><dd id="c-creador">—</dd></div>
+    </dl>
+
+    <section class="bloque">
+      <h2>Solicitante principal</h2>
+      <dl class="datos" id="d-principal"></dl>
+    </section>
+
+    <section class="bloque" id="bloque-segundo" hidden>
+      <h2>Segundo solicitante</h2>
+      <dl class="datos" id="d-segundo"></dl>
+    </section>
+
+    <section class="bloque">
+      <h2>Hogar y vivienda</h2>
+      <dl class="datos" id="d-hogar"></dl>
+    </section>
+
+    <section class="bloque sensible">
+      <div class="etiqueta-sensible">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A4E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Información sensible
+      </div>
+      <h2>Situación socioeconómica y disponibilidad</h2>
+      <dl class="datos" id="d-sensible"></dl>
+    </section>
+
+    <section class="bloque">
+      <h2>Historial de la solicitud</h2>
+      <ul class="historial" id="historial"></ul>
+      <p id="sin-historial" class="vacio" hidden>Todavía no hay movimientos registrados.</p>
+    </section>
+  </div>
+</main>
+
+<script src="js/sesion.js"></script>
+<script src="js/familia-detalle.js"></script>
+<script src="js/volver-arriba.js"></script>
+</body>
+</html>

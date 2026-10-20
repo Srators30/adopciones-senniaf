@@ -2,6 +2,7 @@ package com.senniaf.adopciones.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -11,15 +12,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 /**
  * Configuracion central de seguridad (HU-01):
  * - Sesiones sin estado (stateless), autenticacion via JWT.
  * - Contrasenas con BCrypt.
  * - Reglas de autorizacion por rol.
+ * - Archivos estaticos del frontend (login y formularios) publicos.
  */
 @Configuration
 @EnableWebSecurity
@@ -57,6 +58,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Frontend estatico: el navegador pide estos archivos sin
+                        // encabezado Authorization, asi que deben ser publicos.
+                        // No contienen datos de nadie; los expedientes viajan por
+                        // la API, que si exige token y rol.
+                        .requestMatchers("/", "/*.html", "/css/**", "/js/**", "/favicon.ico", "/error").permitAll()
+
                         .requestMatchers("/api/auth/**", "/h2-console/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
                         .requestMatchers("/api/tecnico/**").hasAnyRole("ADMINISTRADOR", "TECNICO")
@@ -64,10 +71,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
+                // Sin token -> 401 (no te identificaste).
+                // Con token pero sin rol suficiente -> 403 (lo maneja Spring aparte).
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 // Solo necesario para poder ver la consola H2 en un iframe durante el desarrollo.

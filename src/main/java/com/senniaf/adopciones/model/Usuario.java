@@ -35,6 +35,14 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    /**
+     * Nombre para mostrar en pantalla ("Maria Gonzalez"). Es distinto del
+     * username, que es la credencial. Puede quedar vacio: en ese caso se
+     * muestra el username.
+     */
+    @Column(name = "nombre_completo")
+    private String nombreCompleto;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Rol rol;
@@ -47,9 +55,14 @@ public class Usuario implements UserDetails {
     }
 
     public Usuario(String username, String passwordHasheado, Rol rol) {
+        this(username, passwordHasheado, rol, null);
+    }
+
+    public Usuario(String username, String passwordHasheado, Rol rol, String nombreCompleto) {
         this.username = username;
         this.password = passwordHasheado;
         this.rol = rol;
+        this.nombreCompleto = nombreCompleto;
         this.habilitado = true;
     }
 
@@ -67,6 +80,15 @@ public class Usuario implements UserDetails {
 
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    /** Si no se registro un nombre, se muestra el username. */
+    public String getNombreCompleto() {
+        return (nombreCompleto == null || nombreCompleto.isBlank()) ? username : nombreCompleto;
+    }
+
+    public void setNombreCompleto(String nombreCompleto) {
+        this.nombreCompleto = nombreCompleto;
     }
 
     public void setHabilitado(boolean habilitado) {

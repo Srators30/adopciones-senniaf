@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Familias solicitantes | SENNIAF</title>
+
+<!--
+  =====================================================================
+  SENNIAF · HU-05 · Registro de familias solicitantes
+  Listado con filtros. Los datos salen de GET /api/familias, que exige
+  token pero admite los tres roles: el Juez puede consultar aunque no
+  pueda registrar ni modificar.
+  =====================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/expedientes.css">
+<link rel="stylesheet" href="css/familias.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">SENNIAF <small>Sistema de gestión de adopciones</small></div>
+    <div class="user">
+      <strong id="sesion-nombre">—</strong>
+      <span><span id="sesion-rol">—</span> · <a href="#" id="btn-salir" style="color:inherit">Cerrar sesión</a></span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="page-head">
+    <div>
+      <h1>Familias solicitantes</h1>
+      <p>Busca una familia por apellido, número de solicitud o documento. Abre la ficha para ver el detalle y el historial.</p>
+    </div>
+    <a class="btn btn-primary" href="familia_registro.html" id="btn-nueva" hidden>Registrar familia</a>
+  </div>
+
+  <div class="banner banner-info" role="note">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B4B9B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    <span>Cada ficha que abras queda registrada en el historial de la solicitud con tu usuario, la fecha y la hora.</span>
+  </div>
+
+  <form class="filtros filtros-familia" id="form-filtros" autocomplete="off">
+    <div class="field">
+      <label for="q">Buscar</label>
+      <input type="text" id="q" name="q" maxlength="60" placeholder="Apellido, N.º de solicitud o documento">
+    </div>
+    <div class="field">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado">
+        <option value="">Todos</option>
+        <option value="REGISTRADA">Registrada</option>
+        <option value="EN_EVALUACION">En evaluación</option>
+        <option value="CERRADA">Cerrada</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="modalidad">Modalidad</label>
+      <select id="modalidad" name="modalidad">
+        <option value="">Todas</option>
+        <option value="adopcion">Adopción</option>
+        <option value="acogimiento_familiar">Acogimiento familiar</option>
+      </select>
+    </div>
+    <div class="field">
+      <!-- panama.js llena esta lista sola -->
+      <label for="provincia">Provincia</label>
+      <select id="provincia" name="provincia" data-provincias-filtro="Todas"></select>
+    </div>
+    <div class="acciones">
+      <button type="submit" class="btn btn-primary">Buscar</button>
+      <button type="button" class="btn btn-secondary" id="btn-limpiar">Limpiar</button>
+    </div>
+  </form>
+
+  <div class="banner banner-error" role="alert" id="banner-error" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+    <span id="banner-error-text"></span>
+  </div>
+
+  <p class="resumen-resultados"><span id="resumen">Cargando…</span></p>
+
+  <div class="tabla-envoltura">
+    <table class="expedientes">
+      <caption style="position:absolute;left:-9999px">Familias solicitantes registradas</caption>
+      <thead>
+        <tr>
+          <th scope="col">N.º solicitud</th>
+          <th scope="col">Familia</th>
+          <th scope="col">Modalidad</th>
+          <th scope="col">Residencia</th>
+          <th scope="col">Edad que acoge</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Registrada</th>
+        </tr>
+      </thead>
+      <tbody id="filas"></tbody>
+    </table>
+    <div class="vacio" id="vacio" hidden>
+      <strong>No hay familias que coincidan</strong>
+      Prueba con otro texto o quita los filtros.
+    </div>
+  </div>
+
+  <div class="paginacion">
+    <button type="button" class="btn btn-secondary" id="btn-anterior" disabled>Anterior</button>
+    <span id="indicador-pagina">Página 1</span>
+    <button type="button" class="btn btn-secondary" id="btn-siguiente" disabled>Siguiente</button>
+  </div>
+</main>
+
+<script src="js/sesion.js"></script>
+<script src="js/panama.js"></script>
+<script src="js/familias.js"></script>
+<script src="js/volver-arriba.js"></script>
+</body>
+</html>

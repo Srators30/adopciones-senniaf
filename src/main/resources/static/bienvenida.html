@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inicio | SENNIAF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<style>
+  .page { max-width: 720px; margin: 0 auto; padding: 40px 24px; }
+  .page h1 { font: 700 1.75rem var(--font-head); margin: 0 0 6px; }
+  .cards { display: grid; gap: 14px; margin-top: 24px; }
+  .card {
+    display: block; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 8px; text-decoration: none; color: var(--ink);
+  }
+  .card:hover { border-color: var(--blue); }
+  .card strong { display: block; font-size: 1.0625rem; margin-bottom: 2px; }
+  .card span { color: var(--muted); font-size: .9375rem; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">SENNIAF <small>Sistema de gestión de adopciones</small></div>
+    <div class="user">
+      <strong id="sesion-nombre">—</strong>
+      <span><span id="sesion-rol">—</span> · <a href="#" id="btn-salir" style="color:inherit">Cerrar sesión</a></span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <h1>Hola, <span id="saludo-nombre">—</span></h1>
+  <p style="color:var(--muted)">Elige qué quieres hacer.</p>
+
+  <div class="cards">
+    <!-- data-roles: sesion.js muestra solo las tarjetas del rol del token.
+         Es comodidad visual; quien bloquea de verdad es el backend. -->
+    <!-- HU-03: consultar lo registrado. Los tres roles pueden entrar;
+         el Juez solo lee, porque escribir vive en /api/tecnico/**. -->
+    <a class="card" href="expedientes.html" data-roles="ADMINISTRADOR,TECNICO,JUEZ" hidden>
+      <strong>Consultar expedientes</strong>
+      <span>Buscar un expediente, ver su ficha y su historial de cambios (HU-03).</span>
+    </a>
+
+    <a class="card" href="registro_menor.html" data-roles="ADMINISTRADOR,TECNICO" hidden>
+      <strong>Registrar menor</strong>
+      <span>Crear el expediente digital de un menor (HU-02).</span>
+    </a>
+
+    <!-- HU-05: el otro lado del sistema. Hasta aquí todo giraba en
+         torno al menor; esta es la primera pantalla sobre quien lo
+         recibiría. -->
+    <a class="card" href="familias.html" data-roles="ADMINISTRADOR,TECNICO,JUEZ" hidden>
+      <strong>Familias solicitantes</strong>
+      <span>Registrar y consultar las familias que solicitan adopción o acogimiento (HU-05).</span>
+    </a>
+
+    <a class="card" href="crear-usuario.html" data-roles="ADMINISTRADOR" hidden>
+      <strong>Crear usuario</strong>
+      <span>Dar acceso a una nueva persona autorizada (HU-01).</span>
+    </a>
+
+    <p style="color:var(--muted)" data-roles="JUEZ" hidden>Como Juez puedes consultar expedientes. La actualización del estado jurídico del menor (HU-07) se construye en el Sprint 7.</p>
+  </div>
+</main>
+<script src="js/sesion.js"></script>
+<script>Sesion.exigir(); Sesion.pintarBarra(); Sesion.mostrarPorRol();</script>
+</body>
+</html>

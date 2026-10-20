@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Iniciar sesión | SENNIAF</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/login.css">
+</head>
+<body class="login-body">
+
+<section class="login-intro">
+  <div class="brand-mark">SENNIAF <small>Sistema de gestión de adopciones</small></div>
+
+  <div class="claim">
+    <h1>Acceso restringido a personal autorizado</h1>
+    <p>Solo personal de SENNIAF y del órgano judicial designado pueden consultar los expedientes de menores y familias.</p>
+  </div>
+
+  <ul class="safeguards">
+    <li>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      Cada inicio de sesión queda registrado con fecha y hora.
+    </li>
+    <li>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
+      Solo ves las funciones que corresponden a tu rol.
+    </li>
+    <li>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7z"/></svg>
+      La sesión se cierra sola después de un período de inactividad.
+    </li>
+  </ul>
+</section>
+
+<section class="login-panel">
+  <div class="login-card">
+    <p class="eyebrow">Bienvenido/a de vuelta</p>
+    <h2>Inicia sesión</h2>
+
+    <div class="banner banner-error" role="alert" id="banner-error" hidden>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <!-- El texto lo pone login-api.js según responda el backend.
+           Mensaje genérico a propósito: nunca decir cuál de los dos campos falló. -->
+      <span id="banner-error-text">Usuario o contraseña incorrectos.</span>
+    </div>
+
+    <div id="resumen-errores" role="alert" tabindex="-1" hidden>
+      <h2>Revisa estos campos</h2>
+      <ul></ul>
+    </div>
+
+    <!-- Sin csrf_token: la API es stateless y no usa cookies de sesión,
+         así que el ataque que CSRF previene no aplica. -->
+    <form id="form-login" autocomplete="off" novalidate>
+
+      <div class="field">
+        <label for="username">Usuario <span class="req" aria-hidden="true">*</span></label>
+        <input type="text" id="username" name="username" required maxlength="40" autocomplete="username" aria-describedby="e-username">
+        <p class="error" id="e-username"></p>
+      </div>
+
+      <div class="field">
+        <label for="password" style="margin-bottom:0">Contraseña <span class="req" aria-hidden="true">*</span></label>
+        <div class="password-field">
+          <input type="password" id="password" name="password" required autocomplete="current-password" aria-describedby="e-password">
+          <button type="button" class="password-toggle" id="toggle-password" aria-label="Mostrar contraseña" aria-pressed="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <p class="error" id="e-password"></p>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary btn-block" id="btn-entrar">Entrar</button>
+      </div>
+    </form>
+
+    <p class="fineprint">¿Problemas para entrar? Comunícate con la persona administradora de tu oficina; las cuentas no se crean desde esta pantalla.</p>
+  </div>
+</section>
+
+<script src="js/sesion.js"></script>
+<script src="js/login.js"></script>
+<script src="js/login-api.js"></script>
+</body>
+</html>

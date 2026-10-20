@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Registrar menor | SENNIAF</title>
+
+<!--
+  =====================================================================
+  SENNIAF · HU-02 · Registro del expediente digital del menor
+  Recibido en guardar_menor.php (POST). Ese script debe VOLVER A
+  VALIDAR todo en el servidor (esta validación es solo ayuda para
+  quien llena el formulario).
+
+  Campos enviados por POST (name):
+    csrf_token, nombres, apellidos, sexo, fecha_nacimiento,
+    tipo_documento, numero_documento, nacionalidad, nacionalidad_otra,
+    provincia_nacimiento, distrito_nacimiento, corregimiento_nacimiento,
+    pais_nacimiento, fecha_ingreso, modalidad_acogida, nombre_centro,
+    autoridad_remitente, numero_oficio, motivo_ingreso, observaciones,
+    hermanos, hermanos_cantidad, hermanos_referencia,
+    familiar_nombre, familiar_parentesco, familiar_telefono,
+    necesidades_especiales, detalle_necesidades, pueblo_indigena,
+    declaracion_autorizacion, declaracion_trazabilidad
+
+  NO se envían (los asigna el servidor, criterio de aceptación HU-02):
+    id del expediente, estado inicial, fecha de creación, usuario
+    responsable. La "ficha" de arriba solo los muestra.
+
+  Los campos que quedan ocultos se deshabilitan, por eso no viajan en
+  el POST (minimización de datos, Ley 81 de 2019).
+  Los catálogos (provincias, motivos, autoridades, etc.) son de ejemplo:
+  deben salir de la base de datos cuando exista.
+  =====================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/registro_menor.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">SENNIAF <small>Sistema de gestión de adopciones</small></div>
+    <div class="user">
+      <strong id="sesion-nombre">—</strong>
+      <span><span id="sesion-rol">—</span> · <a href="#" id="btn-salir" style="color:inherit">Cerrar sesión</a></span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="page-head">
+    <h1>Registrar menor</h1>
+    <p>Crea el expediente digital con los datos esenciales. Los campos marcados con <span class="req" aria-hidden="true">*</span><span class="sr-only" style="position:absolute;left:-9999px">asterisco</span> son obligatorios.</p>
+  </div>
+
+  <dl class="ficha" aria-label="Datos que asigna el sistema al guardar">
+    <div><dt>N.º de expediente</dt><dd class="pending">Se asigna al guardar</dd></div>
+    <div><dt>Estado inicial</dt><dd>Registrado</dd></div>
+    <div><dt>Fecha de creación</dt><dd id="fecha-hoy">—</dd></div>
+    <div><dt>Responsable</dt><dd id="responsable-out">—</dd></div>
+  </dl>
+  <p class="ficha-note">Estos datos los asigna el servidor; no se pueden editar aquí.</p>
+
+  <div class="banner banner-info" role="status" id="banner-creado" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B4B9B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+    <span>Expediente <strong id="numero-creado"></strong> guardado correctamente.</span>
+  </div>
+  <div class="banner banner-error" role="alert" id="banner-error" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+    <span id="banner-error-text"></span>
+  </div>
+
+  <div class="banner banner-info" role="note">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B4B9B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    <span>Este expediente contiene datos personales de un menor. Registra solo lo necesario: cada consulta y cada cambio queda asociado a tu usuario, con fecha y hora.</span>
+  </div>
+
+  <div class="layout">
+    <nav class="rail" aria-label="Secciones del formulario">
+      <ol>
+        <li><a href="#s1">Datos del menor</a></li>
+        <li><a href="#s2">Ingreso al sistema de protección</a></li>
+        <li><a href="#s3">Familia de origen</a></li>
+        <li><a href="#s4">Salud e identidad cultural</a></li>
+        <li><a href="#s5">Tratamiento de datos y confirmación</a></li>
+      </ol>
+    </nav>
+
+    <form id="form-menor" autocomplete="off" novalidate>
+
+      <div id="resumen-errores" role="alert" tabindex="-1" hidden>
+        <h2>Revisa estos campos antes de guardar</h2>
+        <ul></ul>
+      </div>
+
+      <!-- 1. DATOS DEL MENOR -->
+      <section class="sec" id="s1" aria-labelledby="t1">
+        <h2 id="t1">Datos del menor</h2>
+        <p class="lead">Escribe los datos tal como aparecen en el documento oficial de identificación.</p>
+        <div class="grid">
+          <div class="field">
+            <label for="nombres">Nombres <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="nombres" name="nombres" required maxlength="80" aria-describedby="e-nombres">
+            <p class="error" id="e-nombres"></p>
+          </div>
+          <div class="field">
+            <label for="apellidos">Apellidos <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="apellidos" name="apellidos" required maxlength="80" aria-describedby="e-apellidos">
+            <p class="error" id="e-apellidos"></p>
+          </div>
+
+          <fieldset class="field">
+            <legend>Sexo <span class="req" aria-hidden="true">*</span></legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="sexo" value="F" required> Femenino</label>
+              <label class="choice"><input type="radio" name="sexo" value="M"> Masculino</label>
+            </div>
+            <p class="error" id="e-sexo"></p>
+          </fieldset>
+
+          <div class="field">
+            <label for="fecha_nacimiento">Fecha de nacimiento <span class="req" aria-hidden="true">*</span></label>
+            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required aria-describedby="edad-out e-fecha_nacimiento">
+            <p class="age-out" id="edad-out" aria-live="polite"></p>
+            <p class="error" id="e-fecha_nacimiento"></p>
+          </div>
+
+          <div class="field">
+            <label for="tipo_documento">Documento de identificación <span class="req" aria-hidden="true">*</span></label>
+            <select id="tipo_documento" name="tipo_documento" required aria-describedby="e-tipo_documento">
+              <option value="">Selecciona</option>
+              <option value="certificado_nacimiento">Certificado de nacimiento</option>
+              <option value="cedula_juvenil">Cédula juvenil</option>
+              <option value="pasaporte">Pasaporte</option>
+              <option value="sin_documento">Sin documento (inscripción pendiente)</option>
+            </select>
+            <p class="error" id="e-tipo_documento"></p>
+          </div>
+          <div class="field" id="g-documento">
+            <label for="numero_documento">Número del documento <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="numero_documento" name="numero_documento" required maxlength="20" aria-describedby="h-doc e-numero_documento">
+            <p class="hint" id="h-doc">Letras, números y guiones. Ejemplo: 8-1234-5678</p>
+            <p class="error" id="e-numero_documento"></p>
+          </div>
+
+          <!-- Provincia: lista cerrada con las 10 provincias y las 4
+               comarcas. Antes era texto libre, y "Panamá", "panama" y
+               "Pma" entraban como lugares distintos.
+               data-provincia apunta al id del selector de distrito:
+               panama.js los conecta solo. -->
+          <div class="field" id="g-provincia" >
+            <label for="provincia_nacimiento">Provincia <span class="req" aria-hidden="true">*</span></label>
+            <select id="provincia_nacimiento" name="provincia_nacimiento" required
+                    data-provincia="distrito_nacimiento" aria-describedby="e-provincia_nacimiento">
+              <option value="">Selecciona una provincia</option>
+            </select>
+            <p class="error" id="e-provincia_nacimiento"></p>
+          </div>
+
+          <!-- Distrito: se llena con los distritos de la provincia
+               elegida. Arranca deshabilitado a propósito. -->
+          <div class="field" id="g-distrito" >
+            <label for="distrito_nacimiento">Distrito <span class="req" aria-hidden="true">*</span></label>
+            <select id="distrito_nacimiento" name="distrito_nacimiento" required disabled
+                    aria-describedby="e-distrito_nacimiento">
+              <option value="">Elige primero la provincia</option>
+            </select>
+            <p class="error" id="e-distrito_nacimiento"></p>
+          </div>
+
+          <!-- Corregimiento (solo si el país es Panamá) -->
+          <div class="field" id="g-corregimiento" >
+            <label for="corregimiento_nacimiento">Corregimiento</label>
+            <input type="text" id="corregimiento_nacimiento" name="corregimiento_nacimiento" maxlength="60">
+          </div>
+      </section>
+
+      <!-- 2. INGRESO -->
+      <section class="sec" id="s2" aria-labelledby="t2">
+        <h2 id="t2">Ingreso al sistema de protección</h2>
+        <p class="lead">Indica cuándo y por qué autoridad llegó el menor al sistema.</p>
+        <div class="grid">
+          <div class="field">
+            <label for="fecha_ingreso">Fecha de ingreso <span class="req" aria-hidden="true">*</span></label>
+            <input type="date" id="fecha_ingreso" name="fecha_ingreso" required aria-describedby="e-fecha_ingreso">
+            <p class="error" id="e-fecha_ingreso"></p>
+          </div>
+          <div class="field">
+            <label for="modalidad_acogida">Modalidad de acogida actual <span class="req" aria-hidden="true">*</span></label>
+            <select id="modalidad_acogida" name="modalidad_acogida" required aria-describedby="e-modalidad_acogida">
+              <option value="">Selecciona</option>
+              <option value="centro_acogimiento">Centro de acogimiento</option>
+              <option value="familia_acogida">Familia de acogida</option>
+              <option value="familiar">Acogimiento con un familiar</option>
+              <option value="hospital">Hospital o centro de salud</option>
+              <option value="otra">Otra</option>
+            </select>
+            <p class="error" id="e-modalidad_acogida"></p>
+          </div>
+          <div class="field full">
+            <label for="nombre_centro">Nombre del centro o lugar de acogida</label>
+            <input type="text" id="nombre_centro" name="nombre_centro" maxlength="120">
+          </div>
+          <div class="field">
+            <label for="autoridad_remitente">Autoridad que remite <span class="req" aria-hidden="true">*</span></label>
+            <select id="autoridad_remitente" name="autoridad_remitente" required aria-describedby="e-autoridad_remitente">
+              <option value="">Selecciona</option>
+              <option value="juzgado_ninez">Juzgado de niñez y adolescencia</option>
+              <option value="ministerio_publico">Ministerio Público</option>
+              <option value="policia">Policía Nacional</option>
+              <option value="mides">Ministerio de Desarrollo Social</option>
+              <option value="otra">Otra autoridad</option>
+            </select>
+            <p class="error" id="e-autoridad_remitente"></p>
+          </div>
+          <div class="field">
+            <label for="numero_oficio">N.º de oficio o resolución</label>
+            <input type="text" id="numero_oficio" name="numero_oficio" maxlength="40">
+          </div>
+          <div class="field full">
+            <label for="motivo_ingreso">Motivo de ingreso <span class="req" aria-hidden="true">*</span></label>
+            <select id="motivo_ingreso" name="motivo_ingreso" required aria-describedby="e-motivo_ingreso">
+              <option value="">Selecciona</option>
+              <option value="abandono">Abandono</option>
+              <option value="negligencia">Negligencia o descuido</option>
+              <option value="maltrato">Maltrato o violencia</option>
+              <option value="orfandad">Orfandad</option>
+              <option value="entrega_voluntaria">Entrega voluntaria</option>
+              <option value="otro">Otro</option>
+            </select>
+            <p class="error" id="e-motivo_ingreso"></p>
+          </div>
+          <div class="field full">
+            <label for="observaciones">Observaciones</label>
+            <p class="hint" id="h-obs">Solo lo necesario para ubicar el caso. Los detalles van en los documentos adjuntos del expediente.</p>
+            <textarea id="observaciones" name="observaciones" maxlength="500" aria-describedby="h-obs c-obs"></textarea>
+            <p class="count" id="c-obs" data-for="observaciones">0 / 500</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. FAMILIA DE ORIGEN -->
+      <section class="sec" id="s3" aria-labelledby="t3">
+        <h2 id="t3">Familia de origen</h2>
+        <p class="lead">Registrar a los hermanos ayuda a evitar que se separen durante el proceso.</p>
+        <div class="grid">
+          <fieldset class="field full">
+            <legend>¿Tiene hermanos? <span class="req" aria-hidden="true">*</span></legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="hermanos" value="si" required> Sí</label>
+              <label class="choice"><input type="radio" name="hermanos" value="no"> No</label>
+              <label class="choice"><input type="radio" name="hermanos" value="desconocido"> Se desconoce</label>
+            </div>
+            <p class="error" id="e-hermanos"></p>
+          </fieldset>
+          <div class="field" id="g-hermanos-n" hidden>
+            <label for="hermanos_cantidad">Cantidad de hermanos <span class="req" aria-hidden="true">*</span></label>
+            <input type="number" id="hermanos_cantidad" name="hermanos_cantidad" required min="1" max="20" inputmode="numeric" disabled aria-describedby="e-hermanos_cantidad">
+            <p class="error" id="e-hermanos_cantidad"></p>
+          </div>
+          <div class="field" id="g-hermanos-ref" hidden>
+            <label for="hermanos_referencia">N.º de expediente de los hermanos</label>
+            <input type="text" id="hermanos_referencia" name="hermanos_referencia" maxlength="120" disabled aria-describedby="h-href">
+            <p class="hint" id="h-href">Si ya están registrados en el sistema.</p>
+          </div>
+
+          <div class="field full">
+            <label style="margin-top:6px">Familiar o representante conocido (opcional)</label>
+            <p class="hint">Completa solo si consta en documentos oficiales.</p>
+          </div>
+          <div class="field">
+            <label for="familiar_nombre">Nombre completo</label>
+            <input type="text" id="familiar_nombre" name="familiar_nombre" maxlength="120">
+          </div>
+          <div class="field">
+            <label for="familiar_parentesco">Parentesco o vínculo</label>
+            <input type="text" id="familiar_parentesco" name="familiar_parentesco" maxlength="60">
+          </div>
+          <div class="field">
+            <label for="familiar_telefono">Teléfono</label>
+            <input type="tel" id="familiar_telefono" name="familiar_telefono" maxlength="20" inputmode="tel" aria-describedby="e-familiar_telefono">
+            <p class="error" id="e-familiar_telefono"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. DATOS SENSIBLES -->
+      <section class="sec sens" id="s4" aria-labelledby="t4">
+        <span class="tag-sens">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          Datos sensibles
+        </span>
+        <h2 id="t4">Salud e identidad cultural</h2>
+        <p class="lead">Esta información tiene protección reforzada. Registra únicamente lo que conste en documentos oficiales y sea necesario para atender al menor.</p>
+        <div class="grid">
+          <fieldset class="field full">
+            <legend>¿Tiene una condición de salud o discapacidad que requiera atención especial? <span class="req" aria-hidden="true">*</span></legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="necesidades_especiales" value="si" required> Sí</label>
+              <label class="choice"><input type="radio" name="necesidades_especiales" value="no"> No</label>
+              <label class="choice"><input type="radio" name="necesidades_especiales" value="no_evaluado"> Sin evaluar</label>
+            </div>
+            <p class="error" id="e-necesidades_especiales"></p>
+          </fieldset>
+          <div class="field full" id="g-necesidades" hidden>
+            <label for="detalle_necesidades">Describe brevemente la atención requerida <span class="req" aria-hidden="true">*</span></label>
+            <p class="hint" id="h-nec">Sin diagnósticos detallados: adjunta el informe médico como documento del expediente.</p>
+            <textarea id="detalle_necesidades" name="detalle_necesidades" required maxlength="300" disabled aria-describedby="h-nec c-nec e-detalle_necesidades"></textarea>
+            <p class="count" id="c-nec" data-for="detalle_necesidades">0 / 300</p>
+            <p class="error" id="e-detalle_necesidades"></p>
+          </div>
+          <div class="field full">
+            <label for="pueblo_indigena">Pueblo indígena, si aplica</label>
+            <p class="hint" id="h-pueblo">Se registra solo si consta en documentos oficiales. Dejar en “No determinado” es válido.</p>
+            <select id="pueblo_indigena" name="pueblo_indigena" aria-describedby="h-pueblo">
+              <option value="no_determinado">No determinado</option>
+              <option value="ngabe">Ngäbe</option>
+              <option value="bugle">Buglé</option>
+              <option value="guna">Guna</option>
+              <option value="embera">Emberá</option>
+              <option value="wounaan">Wounaan</option>
+              <option value="naso">Naso Tjër Di</option>
+              <option value="bribri">Bribri</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. TRATAMIENTO DE DATOS Y CONFIRMACIÓN -->
+      <section class="sec" id="s5" aria-labelledby="t5">
+        <h2 id="t5">Tratamiento de datos y confirmación</h2>
+        <p class="lead">Antes de guardar, confirma tu responsabilidad sobre este registro.</p>
+
+        <!-- Texto de ejemplo: debe validarlo el área legal de SENNIAF -->
+        <div class="aviso">
+          <h3>Cómo se usan estos datos</h3>
+          <dl>
+            <dt>Finalidad</dt><dd>Gestionar la protección del menor y su proceso de adopción.</dd>
+            <dt>Marco legal</dt><dd>Ley 46 de 2013 y demás normas aplicables; protección de datos personales según la Ley 81 de 2019.</dd>
+            <dt>Quién accede</dt><dd>Solo personal autorizado según su rol. Cada consulta y cada cambio queda registrado.</dd>
+            <dt>Derechos</dt><dd>El representante legal puede solicitar acceso, rectificación, cancelación, oposición y portabilidad ante SENNIAF.</dd>
+          </dl>
+        </div>
+
+        <div class="grid" style="margin-top:20px">
+          <div class="field full">
+            <label class="check" for="declaracion_autorizacion">
+              <input type="checkbox" id="declaracion_autorizacion" name="declaracion_autorizacion" value="1" required aria-describedby="e-declaracion_autorizacion">
+              <span>Estoy autorizado/a para registrar este expediente y los datos provienen de documentos oficiales o de la resolución de la autoridad que remite. <span class="req" aria-hidden="true">*</span></span>
+            </label>
+            <p class="error" id="e-declaracion_autorizacion"></p>
+          </div>
+          <div class="field full">
+            <label class="check" for="declaracion_trazabilidad">
+              <input type="checkbox" id="declaracion_trazabilidad" name="declaracion_trazabilidad" value="1" required aria-describedby="e-declaracion_trazabilidad">
+              <span>Entiendo que el sistema registrará mi usuario, la fecha y la hora como responsables de este registro. <span class="req" aria-hidden="true">*</span></span>
+            </label>
+            <p class="error" id="e-declaracion_trazabilidad"></p>
+          </div>
+          <!--
+            Ley 82 de 2012 (firma electrónica): si SENNIAF exige firma electrónica
+            calificada para este acto, aquí iría el control de firma (certificado,
+            token o carga de documento firmado). Hoy la confirmación es por casillas.
+          -->
+        </div>
+      </section>
+
+      <div class="actions">
+        <!-- Apuntaba a expedientes.php, que no existe desde que el
+             frontend se pasó a Spring Boot. Ahora va al listado real. -->
+        <a class="btn btn-secondary" href="expedientes.html">Cancelar</a>
+        <button type="submit" class="btn btn-primary" id="btn-guardar">Guardar expediente</button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<script src="js/sesion.js"></script>
+<script src="js/panama.js"></script>
+<script src="js/registro_menor.js"></script>
+<script src="js/registro-api.js"></script>
+<script src="js/volver-arriba.js"></script>
+</body>
+</html>

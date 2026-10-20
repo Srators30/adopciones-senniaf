@@ -1,0 +1,89 @@
+/* =====================================================================
+   SENNIAF · familias.css
+   Lo propio de las tres pantallas de HU-05. Se carga DESPUÉS de
+   base.css y de expedientes.css, y reutiliza de ellas la tabla, la
+   paginación, los bloques de la ficha y el historial: lo que cambia
+   entre un expediente y una familia son los datos, no la forma de
+   mostrarlos.
+   ===================================================================== */
+
+/* Píldoras de estado propias de la solicitud (las del expediente son otras) */
+.pill.registrada { background: var(--blue-tint); color: var(--blue-dark); }
+.pill.en_evaluacion { background: #FFF4E0; color: #8A5A00; }
+.pill.cerrada { background: #EDEFF3; color: var(--muted); }
+
+/* El listado tiene cuatro filtros en vez de tres */
+.filtros.filtros-familia { grid-template-columns: 2fr 1fr 1fr 1fr auto; }
+
+/* --------------------------- Formulario --------------------------- */
+
+.form-familia { max-width: 900px; }
+
+.sec {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 24px; margin-bottom: 20px;
+}
+.sec > h2 {
+  font: 600 1.25rem/1.25 var(--font-head); margin: 0 0 4px;
+  display: flex; align-items: center; gap: 10px;
+}
+.sec > h2 .n {
+  flex: none; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--blue); color: #fff;
+  font: 700 .875rem/28px var(--font-body); text-align: center;
+}
+.sec > .sec-nota { margin: 0 0 18px 38px; color: var(--muted); font-size: .875rem; }
+
+.rejilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 20px; }
+.rejilla .field { margin: 0; min-width: 0; }
+.rejilla .field.medio { grid-column: span 2; }
+.rejilla .field.full { grid-column: 1 / -1; }
+
+/* base.css solo da ancho a text, password, email y select. Los campos
+   de número y de fecha se quedaban del tamaño que les da el navegador,
+   que en una rejilla de tres columnas se ve como un error. */
+.form-familia input[type=number],
+.form-familia input[type=date],
+textarea {
+  width: 100%; min-height: 46px; padding: 9px 12px; font: inherit; color: var(--ink);
+  background: #fff; border: 1.5px solid #8793A8; border-radius: 6px;
+}
+textarea { min-height: 96px; resize: vertical; }
+.form-familia input[type=number]:disabled,
+.form-familia input[type=date]:disabled,
+textarea:disabled { background: #EEF1F5; color: var(--muted); }
+
+.error { color: var(--danger); font-size: .8125rem; margin: 4px 0 0; min-height: 1px; }
+.field.invalid input, .field.invalid select, .field.invalid textarea { border-color: var(--danger); }
+
+/* El rango de edad son dos campos que se leen como uno */
+.rango { display: flex; align-items: center; gap: 10px; }
+.form-familia .rango input[type=number] { width: 96px; }
+.rango span { color: var(--muted); font-size: .9375rem; white-space: nowrap; }
+
+.check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; }
+.check input { margin-top: 3px; flex: none; width: 18px; height: 18px; }
+
+.actions {
+  display: flex; gap: 12px; justify-content: flex-end;
+  padding-top: 4px; padding-bottom: 8px;
+}
+
+/* Aviso de dato sensible dentro del formulario */
+.aviso-dato {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: #FFF8E8; border: 1px solid #E7D3A8; border-radius: 6px;
+  padding: 12px 14px; margin: 0 0 18px; font-size: .875rem; color: #6B4A00;
+}
+
+@media (max-width: 900px) {
+  .filtros.filtros-familia { grid-template-columns: 1fr 1fr; }
+  .rejilla { grid-template-columns: 1fr 1fr; }
+  .rejilla .field.medio { grid-column: span 2; }
+}
+@media (max-width: 640px) {
+  .filtros.filtros-familia { grid-template-columns: 1fr; }
+  .rejilla { grid-template-columns: 1fr; }
+  .rejilla .field.medio, .rejilla .field.full { grid-column: 1; }
+  .sec { padding: 18px 16px; }
+}

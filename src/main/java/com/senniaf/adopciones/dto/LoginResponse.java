@@ -5,11 +5,13 @@ public class LoginResponse {
     private final String token;
     private final String username;
     private final String rol;
+    private final String nombreCompleto;
 
-    public LoginResponse(String token, String username, String rol) {
+    public LoginResponse(String token, String username, String rol, String nombreCompleto) {
         this.token = token;
         this.username = username;
         this.rol = rol;
+        this.nombreCompleto = nombreCompleto;
     }
 
     public String getToken() {
@@ -22,5 +24,10 @@ public class LoginResponse {
 
     public String getRol() {
         return rol;
+    }
+
+    /** Nombre para mostrar en pantalla; el frontend PHP lo usa en la barra superior. */
+    public String getNombreCompleto() {
+        return nombreCompleto;
     }
 }
