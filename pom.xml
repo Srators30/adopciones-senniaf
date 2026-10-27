@@ -15,10 +15,13 @@
     <artifactId>adopciones-senniaf</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>adopciones-senniaf</name>
-    <description>Sistema de Gestion de Adopciones - SENNIAF - Sprint 1: Acceso seguro y control de roles (HU-01)</description>
+    <description>Sistema de Gestion de Adopciones - SENNIAF - Sistema Integral de Gestion de Adopciones</description>
 
     <properties>
         <java.version>17</java.version>
+        <!-- Sprint 6: cobertura y analisis estatico -->
+        <jacoco.version>0.8.12</jacoco.version>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencies>
@@ -90,6 +93,35 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!--
+              Sprint 6: JaCoCo mide que lineas ejecutan las pruebas.
+              prepare-agent engancha el medidor a las pruebas y report
+              escribe el resultado en target/site/jacoco/ al final de
+              "mvn verify": index.html para leerlo, jacoco.xml para
+              SonarQube. No tiene umbral minimo a proposito: con la
+              cobertura actual, un umbral haria fallar la tuberia.
+            -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>preparar-agente</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>reporte-cobertura</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

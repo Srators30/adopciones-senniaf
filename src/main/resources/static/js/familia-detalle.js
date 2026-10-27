@@ -49,7 +49,7 @@
   const SI_NO = { si: 'Sí', no: 'No' };
   const TIPO_EVENTO = {
     CREACION: 'Creación', MODIFICACION: 'Modificación', CONSULTA: 'Consulta',
-    CAMBIO_ESTADO: 'Estado', DOCUMENTO: 'Documento'
+    CAMBIO_ESTADO: 'Estado', DOCUMENTO: 'Documento', DICTAMEN: 'Dictamen'
   };
 
   const et = (mapa, v) => mapa[v] || v || '';
@@ -222,6 +222,12 @@
       pintarFicha(familia);
       prepararEstado(familia);
       contenido.hidden = false;
+
+      /* Sprint 6: avisa a dictamen.js que la familia ya cargó. Así el
+         bloque del dictamen usa estos mismos datos en vez de volver a
+         pedir la ficha, que dejaría una segunda CONSULTA en el historial
+         por cada vez que se abre la página. */
+      document.dispatchEvent(new CustomEvent('familia:cargada', { detail: familia }));
 
       const rh = await Sesion.pedir('/api/familias/' + encodeURIComponent(numero) + '/historial');
       if (rh.ok) pintarHistorial(await rh.json());

@@ -4,7 +4,9 @@ import com.senniaf.adopciones.model.EstadoFamilia;
 import com.senniaf.adopciones.model.FamiliaSolicitante;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -40,4 +42,17 @@ public interface FamiliaRepository extends JpaRepository<FamiliaSolicitante, Lon
                                      Pageable pageable);
 
     boolean existsByNumeroDocumento(String numeroDocumento);
+
+    /**
+     * Sprint 6 (HU-06.1). Trae la familia bloqueando su fila hasta que
+     * termine la transaccion.
+     *
+     * Sin el bloqueo, dos tecnicos que dictaminan la misma familia en el
+     * mismo segundo pasarian los dos la comprobacion de "no tiene dictamen"
+     * y quedarian dos dictamenes vigentes. Con el bloqueo, el segundo
+     * espera, ve el dictamen del primero y recibe 409.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT f FROM FamiliaSolicitante f WHERE f.numeroSolicitud = :numero")
+    Optional<FamiliaSolicitante> buscarParaDictamen(@Param("numero") String numero);
 }

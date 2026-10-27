@@ -1,14 +1,24 @@
 /* =====================================================================
    SENNIAF · base.css
-   Fundamentos compartidos por login.html y crear-usuario.html:
-   tokens de color/tipografía, reset, topbar, controles de formulario,
-   botones y mensajes. Cada página añade su propio archivo con lo que
-   le es exclusivo (login.css / crear-usuario.css).
+   Fundamentos compartidos por todas las pantallas: tokens de color y
+   tipografía, reset, encabezado, controles de formulario, botones y
+   mensajes. Cada página añade su propio archivo con lo que le es
+   exclusivo.
+
+   Decoración del equipo (fondo fotográfico y encabezado con imágenes),
+   adaptada para que funcione en todas las pantallas, incluidas las
+   largas. Los cambios respecto a la versión del zip están marcados con
+   "AJUSTE" y explican qué se rompía.
    ===================================================================== */
 
 :root {
-  --paper: #F4F6F9;
+  --paper: rgb(244, 246, 249);
+  --paper_gradient: linear-gradient(180deg,rgb(244, 246, 249) 0%, rgb(244, 246, 249) 50%, rgb(224, 230, 240) 100%);
   --surface: #FFFFFF;
+  /* Definido por el equipo en registro_menor.css; se sube aquí para que
+     las fichas de expediente y de familia usen el mismo degradado. */
+  --ficha_gradient: linear-gradient(180deg,rgb(255, 255, 255) 0%, rgb(255, 255, 255) 60%, rgb(209, 238, 236) 100%);
+  --surface_gradient: linear-gradient(90deg,rgb(126, 175, 255) 0%, rgba(255, 255, 255, 1) 25%, rgba(255, 255, 255, 1) 80%, rgb(126, 175, 255) 95%, rgb(67, 255, 252) 100%);
   --ink: #152238;
   --muted: #55627A;
   --line: #CFD6E2;
@@ -27,7 +37,28 @@
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  background: var(--paper);
+  /* AJUSTE: antes era height: 1080px. Con altura fija, en las pantallas
+     largas (formulario de familias, fichas) el contenido se salía del
+     body y el fondo se repetía en franjas cada 1080 px, con un corte
+     visible en cada repetición. min-height ocupa al menos la pantalla
+     y crece con el contenido. */
+  min-height: 100vh;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(
+        180deg,
+        rgba(244, 246, 249, 1) 0%,
+        rgba(244, 246, 249, 0.75) 100%
+    ),
+    url("../img/bg.jpg");
+  /* AJUSTE: sin estas cuatro líneas la foto se mostraba a su tamaño
+     original (3088 px de ancho) y solo se veía una esquina de la pared.
+     Con cover se ve la sala completa, y fixed la deja quieta al hacer
+     scroll, igual que ya hacía registro_menor.css. */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: var(--ink);
   font: 400 1rem/1.55 var(--font-body);
 }
@@ -35,10 +66,86 @@ body {
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
 
 /* Encabezado institucional (crear-usuario.html; login.html no lo usa) */
-.topbar { background: var(--surface); border-bottom: 1px solid var(--line); }
+.topbar {
+    position: relative;
+    height: 90px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+/* Imagen del lado izquierdo */
+.topbar::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 260px;
+    height: 100%;
+
+    background-image:
+        linear-gradient(
+            to right,
+            rgba(0, 83, 145, 0.45) 0%,
+            rgba(0, 83, 145, 0.35) 35%,
+            rgba(0, 83, 145, 0.10) 70%,
+            rgba(255, 255, 255, 1) 100%
+        ),
+        url("../img/login_img.jpg");
+
+    background-size: auto 180px;
+    background-position: left center;
+    background-repeat: no-repeat;
+}
+
+
+/* Imagen del lado derecho */
+.topbar::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 260px;
+    height: 100%;
+
+    background-image:
+        linear-gradient(
+            to left,
+            rgba(0, 83, 145, 0.45) 0%,
+            rgba(0, 83, 145, 0.35) 35%,
+            rgba(0, 83, 145, 0.10) 70%,
+            rgba(255, 255, 255, 1) 100%
+        ),
+        url("../img/login_img.jpg");
+
+    background-size: auto 180px;
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+/* AJUSTE: las dos imágenes son elementos posicionados, y el navegador
+   los pinta encima del texto que no lo está. En una pantalla de 1366 px
+   tapaban el nombre "SENNIAF", el nombre del usuario y el enlace de
+   cerrar sesión.
+
+   Dos correcciones: el contenido sube de capa (z-index) y se separa
+   de los bordes lo suficiente para no caer sobre las imágenes. En
+   pantallas anchas sigue alineado con el contenido de la página. */
 .topbar-in {
-  max-width: 1080px; margin: 0 auto; padding: 14px 24px;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  position: relative; z-index: 1;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 max(284px, calc((100% - 1080px) / 2 + 24px));
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+
+/* Por debajo de 1100 px no caben las dos imágenes y el contenido a la
+   vez: se ocultan las imágenes y el encabezado vuelve a ser blanco. */
+@media (max-width: 1100px) {
+  .topbar::before, .topbar::after { display: none; }
+  .topbar-in { padding: 0 24px; }
+}
+@media (max-width: 560px) {
+  .topbar { height: auto; }
+  .topbar-in { padding: 12px 16px; flex-wrap: wrap; }
 }
 .brand { font-family: var(--font-head); font-weight: 700; font-size: 1.25rem; color: var(--blue-dark); }
 .brand small { display: block; font: 400 .8125rem var(--font-body); color: var(--muted); }

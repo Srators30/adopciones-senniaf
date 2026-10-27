@@ -96,6 +96,67 @@
       <dl class="datos" id="d-sensible"></dl>
     </section>
 
+    <!-- Sprint 6 · HU-06.1 y HU-06.2: dictamen de idoneidad.
+         Lo llena js/dictamen.js. El formulario solo aparece para
+         Técnico y Administrador, y solo si la solicitud está En
+         evaluación; el Juez ve el dictamen pero no puede emitirlo. -->
+    <section class="bloque dictamen" id="bloque-dictamen" hidden>
+      <h2>Dictamen de idoneidad</h2>
+
+      <div class="banner banner-error" role="alert" id="dictamen-error" hidden>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <span id="dictamen-error-text"></span>
+      </div>
+
+      <!-- Dictamen ya emitido -->
+      <div id="dictamen-vigente" hidden>
+        <div class="dictamen-cabecera">
+          <span class="pill" id="dv-resultado">—</span>
+          <span class="dictamen-fecha" id="dv-fecha-idoneidad"></span>
+        </div>
+        <dl class="datos">
+          <div><dt>Emitido por</dt><dd id="dv-emisor">—</dd></div>
+          <div><dt>Fecha del dictamen</dt><dd id="dv-fecha">—</dd></div>
+        </dl>
+        <div class="dictamen-observacion">
+          <p class="etiqueta">Fundamento</p>
+          <p id="dv-observacion">—</p>
+        </div>
+        <p class="dictamen-nota">Un dictamen emitido no se puede editar ni borrar.</p>
+      </div>
+
+      <!-- Sin dictamen todavía -->
+      <p class="dictamen-vacio" id="dictamen-vacio" hidden></p>
+
+      <!-- Formulario para emitirlo -->
+      <form id="form-dictamen" class="form-dictamen" novalidate hidden>
+        <fieldset class="resultado">
+          <legend>Resultado <span class="req" aria-hidden="true">*</span></legend>
+          <label class="opcion idonea">
+            <input type="radio" name="resultado" value="IDONEA">
+            <span><strong>Idónea</strong><small>La familia cumple para adoptar o acoger. Entra a la lista de espera.</small></span>
+          </label>
+          <label class="opcion no-idonea">
+            <input type="radio" name="resultado" value="NO_IDONEA">
+            <span><strong>No idónea</strong><small>La familia no cumple. Exige explicar el motivo.</small></span>
+          </label>
+          <p class="error" id="e-resultado"></p>
+        </fieldset>
+
+        <div class="field">
+          <label for="observacion">Fundamento del dictamen <span class="req" aria-hidden="true">*</span></label>
+          <p class="hint" id="observacion-hint">Explica en qué se basa la decisión. Quedará visible en la ficha y no se podrá editar después.</p>
+          <textarea id="observacion" name="observacion" maxlength="2000" aria-describedby="observacion-hint contador-observacion"></textarea>
+          <p class="contador" id="contador-observacion" aria-live="polite">0 caracteres</p>
+          <p class="error" id="e-observacion"></p>
+        </div>
+
+        <div class="acciones-dictamen">
+          <button type="submit" class="btn btn-primary" id="btn-dictamen">Emitir dictamen</button>
+        </div>
+      </form>
+    </section>
+
     <section class="bloque">
       <h2>Historial de la solicitud</h2>
       <ul class="historial" id="historial"></ul>
@@ -105,6 +166,7 @@
 </main>
 
 <script src="js/sesion.js"></script>
+<script src="js/dictamen.js"></script>
 <script src="js/familia-detalle.js"></script>
 <script src="js/volver-arriba.js"></script>
 </body>

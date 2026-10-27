@@ -87,3 +87,41 @@ textarea:disabled { background: #EEF1F5; color: var(--muted); }
   .rejilla .field.medio, .rejilla .field.full { grid-column: 1; }
   .sec { padding: 18px 16px; }
 }
+
+/* ----------------- Sprint 6 · Dictamen de idoneidad ----------------- */
+
+.tipo.dictamen { background: #E6F4F1; color: #136F63; }
+
+.pill.idonea { background: #E3F4EA; color: #1F6F54; }
+.pill.no-idonea { background: #FCEDEC; color: #9C2A22; }
+
+.dictamen-cabecera { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.dictamen-cabecera .pill { font-size: .875rem; padding: 5px 14px; }
+.dictamen-fecha { font-weight: 700; color: var(--ink); }
+
+.dictamen-observacion {
+  margin-top: 16px; padding: 14px 16px;
+  background: var(--paper); border-radius: 6px; border: 1px solid var(--line);
+}
+.dictamen-observacion .etiqueta { margin: 0 0 4px; font-size: .8125rem; color: var(--muted); }
+.dictamen-observacion p:last-child { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
+.dictamen-nota { margin: 12px 0 0; font-size: .8125rem; color: var(--muted); }
+.dictamen-vacio { margin: 0; color: var(--muted); }
+
+.form-dictamen fieldset.resultado { border: 0; padding: 0; margin: 0 0 18px; }
+.form-dictamen fieldset.resultado legend { margin-bottom: 8px; }
+.form-dictamen .opcion {
+  display: flex; gap: 12px; align-items: flex-start; cursor: pointer;
+  padding: 12px 14px; margin-bottom: 8px; font-weight: 400;
+  border: 1.5px solid var(--line); border-radius: 8px; background: #fff;
+}
+.form-dictamen .opcion input { margin-top: 3px; width: 18px; height: 18px; flex: none; }
+.form-dictamen .opcion strong { display: block; }
+.form-dictamen .opcion small { display: block; color: var(--muted); font-size: .8125rem; }
+.form-dictamen .opcion:has(input:checked).idonea { border-color: #1F6F54; background: #F2FAF5; }
+.form-dictamen .opcion:has(input:checked).no-idonea { border-color: #B3261E; background: #FEF6F5; }
+.form-dictamen .resultado.invalid .opcion { border-color: var(--danger); }
+.form-dictamen .contador { margin: 4px 0 0; font-size: .8125rem; color: var(--muted); text-align: right; }
+.form-dictamen .contador.falta { color: #8A5A00; font-weight: 700; }
+.form-dictamen textarea { min-height: 110px; }
+.acciones-dictamen { display: flex; justify-content: flex-end; margin-top: 8px; }

@@ -25,7 +25,12 @@
 /* --------------------------- Resultados --------------------------- */
 .resumen-resultados {
   display: flex; justify-content: space-between; align-items: baseline;
-  gap: 12px; flex-wrap: wrap; margin: 0 0 10px; font-size: .9375rem; color: var(--muted);
+  gap: 12px; flex-wrap: wrap; margin: 0 0 10px; font-size: .9375rem;
+  /* Este texto va directo sobre la foto de fondo, no dentro de una
+     tarjeta. Con el gris de siempre (--muted) quedaba en 3.8:1 en la
+     parte baja de la pantalla, bajo el mínimo de 4.5:1. Un gris más
+     oscuro lo devuelve por encima. */
+  color: #3B475C;
 }
 .tabla-envoltura { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
 table.expedientes { border-collapse: collapse; width: 100%; min-width: 760px; font-size: .9375rem; }
@@ -54,13 +59,16 @@ table.expedientes a:hover { text-decoration: underline; }
 
 /* ---------------------------- Paginación ---------------------------- */
 .paginacion { display: flex; gap: 10px; align-items: center; justify-content: flex-end; margin-top: 16px; }
-.paginacion span { font-size: .9375rem; color: var(--muted); }
+.paginacion span { font-size: .9375rem; color: #3B475C; }   /* sobre la foto: ver .resumen-resultados */
 .paginacion .btn { min-height: 40px; padding: 0 16px; font-size: .9375rem; }
 .paginacion .btn:disabled { opacity: .45; cursor: default; }
 
 /* ------------------------- Ficha de detalle ------------------------- */
 .cabecera-exp {
-  background: var(--surface); border: 1px solid var(--line); border-top: 5px solid var(--blue);
+  /* Mismo degradado que la ficha de registro_menor: es la misma pieza
+     visual, la "pestaña de carpeta" con los datos que asigna el sistema. */
+  background: var(--ficha_gradient, var(--surface));
+  border: 1px solid var(--line); border-top: 5px solid var(--blue);
   border-radius: 0 0 8px 8px; padding: 20px 24px; margin: 20px 0 24px;
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 20px;
 }

@@ -1,11 +1,13 @@
 /* =====================================================================
    SENNIAF · registro_menor.css
-   Exclusivo de registro_menor.php. Requiere css/base.css cargado antes
+   Exclusivo de registro_menor.html. Requiere css/base.css cargado antes
    (comparten variables de color y tipografía).
    ===================================================================== */
 
   :root {
     --paper: #F4F6F9;
+    --paper_gradient: linear-gradient(180deg,rgb(244, 246, 249) 0%, rgb(244, 246, 249) 50%, rgb(224, 230, 240) 100%);
+    --ficha_gradient: linear-gradient(180deg,rgb(255, 255, 255) 0%, rgb(255, 255, 255) 60%, rgb(209, 238, 236) 100%);
     --surface: #FFFFFF;
     --ink: #152238;
     --muted: #55627A;
@@ -26,19 +28,32 @@
   html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    background: var(--paper);
+    /* AJUSTE: height: 1080px cortaba el formulario, que mide más de
+       2500 px. Mismo arreglo que en base.css. */
+    min-height: 100vh;
+    background-color: var(--paper);
+    background-image:
+    linear-gradient(
+        180deg,
+        rgba(244, 246, 249, 1) 0%,
+        rgba(244, 246, 249, 0.75) 100%
+    ),
+    url("../img/bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: var(--ink);
     font: 400 1rem/1.55 var(--font-body);
   }
   :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
 
-  /* Encabezado institucional */
-  .topbar { background: var(--surface); border-bottom: 1px solid var(--line); }
-  .topbar-in {
-    max-width: 1080px; margin: 0 auto; padding: 14px 24px;
-    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-  }
+  /* Encabezado institucional
+     AJUSTE: este archivo volvía a definir .topbar y .topbar-in, y como
+     se carga después de base.css, pisaba el arreglo del encabezado con
+     imágenes: en esta pantalla las fotos volvían a tapar el nombre del
+     sistema y el del usuario. Se quitan las dos reglas y manda base.css. */
   .brand { font-family: var(--font-head); font-weight: 700; font-size: 1.25rem; color: var(--blue-dark); }
   .brand small { display: block; font: 400 .8125rem var(--font-body); color: var(--muted); }
   .user { text-align: right; font-size: .875rem; line-height: 1.3; }
@@ -51,7 +66,9 @@
 
   /* Ficha del expediente: pestaña de carpeta con lo que asigna el sistema */
   .ficha {
-    margin: 24px 0 8px; background: var(--surface);
+    /* AJUSTE: --ficha_gradient estaba definido pero ninguna regla lo
+       usaba. Por el nombre, era para esta ficha. */
+    margin: 24px 0 8px; background: var(--ficha_gradient);
     border: 1px solid var(--line); border-top: 5px solid var(--blue);
     border-radius: 0 0 8px 8px; padding: 14px 18px;
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 20px;
