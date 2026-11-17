@@ -177,6 +177,27 @@ public class FamiliaService {
     }
 
     @Transactional
+    /**
+     * Sprint 7: que cambios de estado se pueden hacer a mano (PATCH .../estado).
+     * Devuelve el motivo del rechazo, o null si el cambio se permite.
+     *   - Una solicitud cerrada solo la reabre el Administrador, con
+     *     motivo (POST /api/admin/familias/{n}/reapertura).
+     *   - Una solicitud con dictamen solo puede cerrarse: su estado lo
+     *     marca el dictamen, y cambiar el resultado es cambiar el dictamen.
+     * Que IDONEA y NO_IDONEA no se elijan a mano lo revisa el controlador
+     * (es un dato invalido, 400; estos son conflictos de estado, 409).
+     */
+    public String rechazoCambioManual(FamiliaSolicitante f, EstadoFamilia nuevo) {
+        if (f.getEstado() == EstadoFamilia.CERRADA && nuevo != EstadoFamilia.CERRADA) {
+            return "Una solicitud cerrada solo la puede reabrir el Administrador, indicando el motivo.";
+        }
+        if (f.getEstado().esDeDictamen() && nuevo != EstadoFamilia.CERRADA && nuevo != f.getEstado()) {
+            return "La solicitud ya tiene dictamen: su estado lo marca el dictamen y solo puede cerrarse. "
+                    + "Para cambiar el resultado, el Administrador cambia el dictamen.";
+        }
+        return null;
+    }
+
     public FamiliaSolicitante cambiarEstado(FamiliaSolicitante f, EstadoFamilia nuevo, Usuario usuario) {
         EstadoFamilia anterior = f.getEstado();
         if (anterior == nuevo) {
@@ -196,6 +217,11 @@ public class FamiliaService {
     public void registrar(FamiliaSolicitante f, TipoEvento tipo, String descripcion, Usuario usuario) {
         eventos.save(new EventoFamilia(f, tipo, descripcion,
                 usuario.getUsername(), usuario.getRol().name()));
+    }
+
+    /** Para ajustes que hace el sistema en nombre de quien tomo la decision original. */
+    public void registrar(FamiliaSolicitante f, TipoEvento tipo, String descripcion, String usuario, String rol) {
+        eventos.save(new EventoFamilia(f, tipo, descripcion, usuario, rol));
     }
 
     // =====================================================================

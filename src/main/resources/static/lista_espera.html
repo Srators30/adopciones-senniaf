@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Lista de espera | SENNIAF</title>
+
+<!--
+  =====================================================================
+  SENNIAF · HU-06.3 · Lista de espera de familias idóneas (Sprint 7)
+  Los datos salen de GET /api/familias/lista-espera, que exige token y
+  admite los tres roles. El orden lo calcula el servidor con una regla
+  fija; esta página solo lo muestra.
+  =====================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/expedientes.css">
+<link rel="stylesheet" href="css/familias.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">SENNIAF <small>Sistema de gestión de adopciones</small></div>
+    <div class="user">
+      <strong id="sesion-nombre">—</strong>
+      <span><span id="sesion-rol">—</span> · <a href="#" id="btn-salir" style="color:inherit">Cerrar sesión</a></span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="page-head">
+    <div>
+      <h1>Lista de espera</h1>
+      <p>Familias con dictamen vigente Idónea, en el orden en que esperan su turno.</p>
+    </div>
+    <a class="btn btn-secondary" href="familias.html">Ver todas las familias</a>
+  </div>
+
+  <div class="banner banner-info" role="note">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B4B9B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+    <span>El orden lo fija una regla, no una persona: primero la fecha de idoneidad, de la más antigua a la más reciente; a igual fecha, el número de solicitud. Si una familia deja de ser idónea o su solicitud se cierra, sale de la lista.</span>
+  </div>
+
+  <div class="banner banner-error" role="alert" id="banner-error" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+    <span id="banner-error-text"></span>
+  </div>
+
+  <p class="resumen-resultados"><span id="resumen">Cargando…</span></p>
+
+  <div class="tabla-envoltura">
+    <table class="expedientes lista-espera">
+      <caption style="position:absolute;left:-9999px">Familias idóneas en lista de espera</caption>
+      <thead>
+        <tr>
+          <th scope="col" class="col-posicion">Posición</th>
+          <th scope="col">N.º solicitud</th>
+          <th scope="col">Familia</th>
+          <th scope="col">Modalidad</th>
+          <th scope="col">Idónea desde</th>
+          <th scope="col" class="col-dias">Días en espera</th>
+        </tr>
+      </thead>
+      <tbody id="filas"></tbody>
+    </table>
+    <div class="vacio" id="vacio" hidden>
+      <strong>Todavía no hay familias en espera</strong>
+      Una familia entra a la lista cuando recibe un dictamen Idónea.
+    </div>
+  </div>
+</main>
+
+<script src="js/sesion.js"></script>
+<script src="js/lista-espera.js"></script>
+<script src="js/volver-arriba.js"></script>
+</body>
+</html>

@@ -11,7 +11,21 @@ package com.senniaf.adopciones.model;
 public enum EstadoFamilia {
     REGISTRADA("Registrada"),
     EN_EVALUACION("En evaluación"),
+    // Sprint 7 (decision del PO): el dictamen mueve el estado. Estos dos
+    // no se eligen a mano: los asigna el dictamen y cambian con el.
+    IDONEA("Idónea"),
+    NO_IDONEA("No idónea"),
     CERRADA("Cerrada");
+
+    /** Estado que corresponde al resultado de un dictamen. */
+    public static EstadoFamilia segunDictamen(ResultadoIdoneidad resultado) {
+        return resultado == ResultadoIdoneidad.IDONEA ? IDONEA : NO_IDONEA;
+    }
+
+    /** IDONEA y NO_IDONEA solo los asigna el dictamen. */
+    public boolean esDeDictamen() {
+        return this == IDONEA || this == NO_IDONEA;
+    }
 
     private final String etiqueta;
 

@@ -17,15 +17,21 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Dictamen de idoneidad de una familia solicitante (HU-06.1 y HU-06.2).
+ * Dictamen de idoneidad de una familia solicitante (HU-06.1, HU-06.2 y HU-06.4).
  *
  * Es una tabla aparte y no un par de columnas en FamiliaSolicitante
- * porque un dictamen se va a poder sustituir (HU-06.4, Sprint 7) y el
- * anterior tiene que conservarse. Con columnas en la familia, el
- * dictamen nuevo pisaria al viejo.
+ * porque un dictamen se puede sustituir (HU-06.4) y el anterior tiene que
+ * conservarse. Con columnas en la familia, el dictamen nuevo pisaria al viejo.
  *
- * No tiene setters salvo el de "vigente": una vez emitido, ni el
- * resultado ni la observacion se pueden cambiar desde el codigo.
+ * No tiene setters: una vez emitido, ni el resultado ni la observacion se
+ * pueden cambiar desde el codigo. Lo unico que le puede pasar a un
+ * dictamen es que lo sustituya otro (metodo sustituir), y eso solo va en
+ * una direccion: de vigente a sustituido, nunca al reves.
+ *
+ * Sprint 7: cada dictamen guarda su periodo de vigencia. Desde
+ * fechaDictamen hasta fechaSustitucion (vacia mientras este vigente). Asi
+ * queda registrado, por ejemplo, desde cuando y hasta cuando una familia
+ * fue No idonea antes de que el Administrador cambiara el dictamen.
  */
 @Entity
 @Table(name = "dictamenes_idoneidad",
@@ -44,15 +50,19 @@ public class DictamenIdoneidad {
     @Column(nullable = false, length = 20)
     private ResultadoIdoneidad resultado;
 
-    /** HU-06.2: obligatoria siempre; al menos 30 caracteres si es NO_IDONEA. */
     @Lob
     @Column(nullable = false, length = 2000)
     private String observacion;
 
-    /** Fecha en que la familia quedo idonea. Solo existe si el resultado es IDONEA. */
+    /**
+     * Solo existe si el resultado es IDONEA. Si un dictamen cambia a
+     * IDONEA, la fecha es la del cambio (decision del PO, Sprint 7): la
+     * familia entra a la lista de espera ese dia, no antes.
+     */
     @Column(name = "fecha_idoneidad")
     private LocalDate fechaIdoneidad;
 
+    /** Inicio de la vigencia. */
     @Column(name = "fecha_dictamen", nullable = false)
     private LocalDateTime fechaDictamen;
 
@@ -62,29 +72,64 @@ public class DictamenIdoneidad {
     @Column(name = "rol_emisor", nullable = false, length = 20)
     private String rolEmisor;
 
-    /**
-     * Solo un dictamen vigente por familia. En este sprint no hay forma de
-     * sustituirlo (el servicio responde 409); el campo existe desde ya
-     * para que HU-06.4 no tenga que migrar la tabla.
-     */
+    /** Solo un dictamen vigente por familia. */
     @Column(nullable = false)
     private boolean vigente = true;
+
+    // ------------------------- Sprint 7 · HU-06.4 -------------------------
+
+    /**
+     * Por que se cambio el dictamen anterior. Vacia en un dictamen
+     * emitido por primera vez; obligatoria en uno que sustituye a otro.
+     */
+    @Lob
+    @Column(name = "justificacion_cambio", length = 1000)
+    private String justificacionCambio;
+
+    /** Fin de la vigencia: cuando otro dictamen lo sustituyo. */
+    @Column(name = "fecha_sustitucion")
+    private LocalDateTime fechaSustitucion;
+
+    /** Quien lo sustituyo (siempre un Administrador). */
+    @Column(name = "sustituido_por", length = 60)
+    private String sustituidoPor;
 
     protected DictamenIdoneidad() {
         // Requerido por JPA
     }
 
+    /** Primer dictamen de una familia (HU-06.1). */
     public DictamenIdoneidad(FamiliaSolicitante familia, ResultadoIdoneidad resultado, String observacion,
                              String emitidoPor, String rolEmisor) {
+        this(familia, resultado, observacion, emitidoPor, rolEmisor, null);
+    }
+
+    /** Dictamen que sustituye a otro (HU-06.4): lleva la justificacion del cambio. */
+    public DictamenIdoneidad(FamiliaSolicitante familia, ResultadoIdoneidad resultado, String observacion,
+                             String emitidoPor, String rolEmisor, String justificacionCambio) {
         this.familia = familia;
         this.resultado = resultado;
         this.observacion = observacion;
         this.emitidoPor = emitidoPor;
         this.rolEmisor = rolEmisor;
+        this.justificacionCambio = justificacionCambio;
         this.fechaDictamen = LocalDateTime.now();
         // HU-06.1, criterio 3: la fecha de idoneidad la pone el sistema, no el usuario.
         this.fechaIdoneidad = resultado == ResultadoIdoneidad.IDONEA ? LocalDate.now() : null;
         this.vigente = true;
+    }
+
+    /**
+     * HU-06.4, criterio 1: el dictamen no se borra ni se reescribe, se
+     * marca como sustituido y conserva todo lo que decia.
+     */
+    public void sustituir(String usuario) {
+        if (!vigente) {
+            throw new IllegalStateException("El dictamen ya estaba sustituido");
+        }
+        this.vigente = false;
+        this.fechaSustitucion = LocalDateTime.now();
+        this.sustituidoPor = usuario;
     }
 
     public Long getId() { return id; }
@@ -96,4 +141,7 @@ public class DictamenIdoneidad {
     public String getEmitidoPor() { return emitidoPor; }
     public String getRolEmisor() { return rolEmisor; }
     public boolean isVigente() { return vigente; }
+    public String getJustificacionCambio() { return justificacionCambio; }
+    public LocalDateTime getFechaSustitucion() { return fechaSustitucion; }
+    public String getSustituidoPor() { return sustituidoPor; }
 }

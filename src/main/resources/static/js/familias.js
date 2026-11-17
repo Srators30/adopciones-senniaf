@@ -34,6 +34,8 @@
   const ESTADO = {
     REGISTRADA: 'Registrada',
     EN_EVALUACION: 'En evaluación',
+    IDONEA: 'Idónea',          // Sprint 7: los asigna el dictamen
+    NO_IDONEA: 'No idónea',
     CERRADA: 'Cerrada'
   };
 

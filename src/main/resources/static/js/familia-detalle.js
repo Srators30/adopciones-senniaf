@@ -26,7 +26,11 @@
     return;
   }
 
-  const ESTADO = { REGISTRADA: 'Registrada', EN_EVALUACION: 'En evaluación', CERRADA: 'Cerrada' };
+  const ESTADO = {
+    REGISTRADA: 'Registrada', EN_EVALUACION: 'En evaluación',
+    IDONEA: 'Idónea', NO_IDONEA: 'No idónea',   // Sprint 7: los asigna el dictamen
+    CERRADA: 'Cerrada'
+  };
   const MODALIDAD = { adopcion: 'Adopción', acogimiento_familiar: 'Acogimiento familiar' };
   const DOCUMENTO = { cedula: 'Cédula', pasaporte: 'Pasaporte', carne_residente: 'Carné de residente' };
   const CIVIL = {
@@ -174,13 +178,74 @@
   // ------------------------------------------------------------------
   //  Cambio de estado (solo para quien puede escribir)
   // ------------------------------------------------------------------
+  /* Sprint 7 (decisión del PO): una solicitud cerrada solo la reabre el
+     Administrador, con motivo. Vuelve al estado de su dictamen. */
+  function prepararReapertura() {
+    if (sesion.rol !== 'ADMINISTRADOR') return;
+    const abrir = document.getElementById('btn-abrir-reapertura');
+    const form = document.getElementById('form-reapertura');
+    const motivo = document.getElementById('motivo-reapertura');
+    const error = document.getElementById('e-motivo');
+    const boton = document.getElementById('btn-reabrir');
+    const MINIMO = 20;   // igual que en el servidor
+    abrir.hidden = false;
+
+    abrir.addEventListener('click', () => { abrir.hidden = true; form.hidden = false; motivo.focus(); });
+    document.getElementById('btn-cancelar-reapertura').addEventListener('click', () => {
+      form.hidden = true; abrir.hidden = false;
+    });
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      banner.hidden = true;
+      const texto = motivo.value.trim();
+      if (texto.length < MINIMO) {
+        error.textContent = 'Explica el motivo en al menos ' + MINIMO + ' caracteres.';
+        motivo.closest('.field').classList.add('invalid');
+        return;
+      }
+      error.textContent = '';
+      motivo.closest('.field').classList.remove('invalid');
+      boton.disabled = true;
+      boton.textContent = 'Reabriendo…';
+      try {
+        const r = await Sesion.pedir('/api/admin/familias/' + encodeURIComponent(numero) + '/reapertura',
+          { method: 'POST', body: JSON.stringify({ motivo: texto }) });
+        if (r.ok) { location.reload(); return; }
+        const detalle = await r.json().catch(() => ({}));
+        if (r.status === 403) fallar('Solo el Administrador puede reabrir una solicitud.');
+        else fallar(detalle.error || 'No se pudo reabrir la solicitud (' + r.status + ').');
+      } catch (err) {
+        if (err.message !== 'sesion') fallar('No se pudo conectar con el servidor.');
+      } finally {
+        boton.disabled = false;
+        boton.textContent = 'Reabrir solicitud';
+      }
+    });
+  }
+
+  function opcion(valor) {
+    const o = document.createElement('option');
+    o.value = valor;
+    o.textContent = ESTADO[valor];
+    return o;
+  }
+
   function prepararEstado(f) {
     if (['ADMINISTRADOR', 'TECNICO'].indexOf(sesion.rol) === -1) return;
-    if (f.estado === 'CERRADA') return;   // cerrada no se reabre desde aquí
+    if (f.estado === 'CERRADA') { prepararReapertura(); return; }
 
     const caja = document.getElementById('control-estado');
     const select = document.getElementById('nuevo-estado');
     const boton = document.getElementById('btn-estado');
+
+    /* Sprint 7: con dictamen, el estado lo marca el dictamen y la única
+       salida manual es cerrar la solicitud. */
+    select.replaceChildren();
+    const opciones = (f.estado === 'IDONEA' || f.estado === 'NO_IDONEA')
+      ? [f.estado, 'CERRADA']
+      : ['REGISTRADA', 'EN_EVALUACION', 'CERRADA'];
+    opciones.forEach(v => select.appendChild(opcion(v)));
     select.value = f.estado;
     caja.hidden = false;
 
@@ -196,7 +261,11 @@
           { method: 'PATCH', body: JSON.stringify({ estado: select.value }) });
 
         if (r.status === 403) { fallar('Tu rol no puede cambiar el estado de la solicitud.'); return; }
-        if (!r.ok) { fallar('No se pudo cambiar el estado (' + r.status + ').'); return; }
+        if (!r.ok) {
+          const detalle = await r.json().catch(() => ({}));
+          fallar(detalle.error || 'No se pudo cambiar el estado (' + r.status + ').');
+          return;
+        }
 
         location.reload();   // la forma más simple de reflejar ficha e historial
       } catch (err) {

@@ -125,3 +125,44 @@ textarea:disabled { background: #EEF1F5; color: var(--muted); }
 .form-dictamen .contador.falta { color: #8A5A00; font-weight: 700; }
 .form-dictamen textarea { min-height: 110px; }
 .acciones-dictamen { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+/* ===================== Sprint 7 · HU-06.3 y HU-06.4 ===================== */
+
+/* Posición en la lista de espera, dentro de la ficha */
+.dictamen-posicion { margin: -6px 0 16px; color: var(--ink); }
+.dictamen-posicion strong { font-size: 1.0625rem; }
+
+/* Cambio de dictamen (solo Administrador) */
+.form-cambio { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
+.form-cambio h3 { margin: 0 0 4px; font: 700 1.0625rem var(--font-head); }
+.form-cambio > .hint { margin: 0 0 14px; }
+.form-dictamen .opcion.deshabilitada { opacity: .5; cursor: not-allowed; }
+.acciones-dictamen { gap: 10px; }
+
+/* Historial de dictámenes */
+.dictamen-historial { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+.dictamen-historial h3 { margin: 0 0 12px; font: 700 1.0625rem var(--font-head); }
+.dictamen-historial ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.dictamen-historial li { padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.dictamen-historial li.sustituido { background: var(--paper); }
+.dh-cabecera { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dh-periodo { font-weight: 700; color: var(--ink); font-size: .9375rem; }
+.dh-quien { margin: 6px 0 0; font-size: .8125rem; color: var(--muted); }
+.dh-texto { margin: 6px 0 0; white-space: pre-line; overflow-wrap: anywhere; }
+.dh-justificacion { font-style: italic; }
+
+/* Lista de espera */
+.lista-espera .col-posicion { width: 88px; text-align: center; }
+.lista-espera .col-dias { text-align: right; white-space: nowrap; }
+.lista-espera .posicion {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 32px; height: 32px; padding: 0 8px; border-radius: 16px;
+  background: #E3F4EA; color: #1F6F54; font-weight: 700;
+}
+.acciones-cabecera { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; }
+
+/* Sprint 7: estados que asigna el dictamen, y reapertura */
+.pill.no_idonea { background: #FCEDEC; color: #9C2A22; }
+.reapertura { margin-bottom: 18px; }
+.reapertura h2 { margin: 0 0 4px; }
+.reapertura > .hint { margin: 0 0 12px; }

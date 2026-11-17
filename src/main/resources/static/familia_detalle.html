@@ -63,7 +63,25 @@
         </div>
         <button type="button" class="btn btn-primary" id="btn-estado" style="min-height:46px">Aplicar</button>
       </div>
+
+      <!-- Sprint 7: solo el Administrador reabre una solicitud cerrada -->
+      <button type="button" class="btn btn-secondary" id="btn-abrir-reapertura" hidden>Reabrir solicitud</button>
     </div>
+
+    <form class="bloque reapertura" id="form-reapertura" novalidate hidden>
+      <h2>Reabrir solicitud</h2>
+      <p class="hint">Volverá al estado que marque su dictamen vigente, o a En evaluación si nunca tuvo dictamen. La reapertura y su motivo quedan en el historial.</p>
+      <div class="field">
+        <label for="motivo-reapertura">Motivo de la reapertura <span class="req" aria-hidden="true">*</span></label>
+        <p class="hint" id="motivo-hint">Al menos 20 caracteres.</p>
+        <textarea id="motivo-reapertura" maxlength="1000" aria-describedby="motivo-hint"></textarea>
+        <p class="error" id="e-motivo"></p>
+      </div>
+      <div class="acciones-dictamen">
+        <button type="button" class="btn btn-secondary" id="btn-cancelar-reapertura">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="btn-reabrir">Reabrir solicitud</button>
+      </div>
+    </form>
 
     <dl class="cabecera-exp">
       <div><dt>Estado</dt><dd id="c-estado">—</dd></div>
@@ -114,6 +132,11 @@
           <span class="pill" id="dv-resultado">—</span>
           <span class="dictamen-fecha" id="dv-fecha-idoneidad"></span>
         </div>
+        <!-- HU-06.3, criterio 5: la posición en la lista también se ve aquí -->
+        <p class="dictamen-posicion" id="dv-posicion" hidden>
+          Posición en la lista de espera: <strong id="dv-posicion-numero">—</strong>
+          · <a href="lista_espera.html">Ver la lista completa</a>
+        </p>
         <dl class="datos">
           <div><dt>Emitido por</dt><dd id="dv-emisor">—</dd></div>
           <div><dt>Fecha del dictamen</dt><dd id="dv-fecha">—</dd></div>
@@ -122,7 +145,59 @@
           <p class="etiqueta">Fundamento</p>
           <p id="dv-observacion">—</p>
         </div>
-        <p class="dictamen-nota">Un dictamen emitido no se puede editar ni borrar.</p>
+        <div class="dictamen-observacion" id="dv-justificacion-caja" hidden>
+          <p class="etiqueta">Motivo del cambio de dictamen</p>
+          <p id="dv-justificacion">—</p>
+        </div>
+        <p class="dictamen-nota">Un dictamen emitido no se puede editar ni borrar. Solo el Administrador puede sustituirlo por otro, con justificación, y el anterior queda en el historial.</p>
+
+        <!-- HU-06.4: solo el Administrador ve esto (el servidor lo exige igual) -->
+        <div class="acciones-dictamen" id="cambio-acciones" hidden>
+          <button type="button" class="btn btn-secondary" id="btn-abrir-cambio">Cambiar dictamen</button>
+        </div>
+        <p class="dictamen-nota" id="cambio-cerrada" hidden>La solicitud está cerrada: para cambiar el dictamen, primero reábrela con el botón «Reabrir solicitud» de arriba.</p>
+
+        <form id="form-cambio" class="form-dictamen form-cambio" novalidate hidden>
+          <h3>Cambiar dictamen</h3>
+          <p class="hint">El dictamen actual se conserva marcado como sustituido, con el periodo en que estuvo vigente. Si el nuevo resultado es Idónea, la fecha de idoneidad será la de hoy.</p>
+          <fieldset class="resultado">
+            <legend>Nuevo resultado <span class="req" aria-hidden="true">*</span></legend>
+            <label class="opcion idonea">
+              <input type="radio" name="cambio-resultado" value="IDONEA">
+              <span><strong>Idónea</strong><small>Entra a la lista de espera con fecha de hoy.</small></span>
+            </label>
+            <label class="opcion no-idonea">
+              <input type="radio" name="cambio-resultado" value="NO_IDONEA">
+              <span><strong>No idónea</strong><small>Sale de la lista de espera en este momento.</small></span>
+            </label>
+            <p class="error" id="ec-resultado"></p>
+          </fieldset>
+
+          <div class="field">
+            <label for="cambio-observacion">Fundamento del nuevo dictamen <span class="req" aria-hidden="true">*</span></label>
+            <textarea id="cambio-observacion" maxlength="2000" aria-describedby="contador-cambio"></textarea>
+            <p class="contador" id="contador-cambio" aria-live="polite">0 caracteres</p>
+            <p class="error" id="ec-observacion"></p>
+          </div>
+
+          <div class="field">
+            <label for="cambio-justificacion">Por qué se cambia el dictamen <span class="req" aria-hidden="true">*</span></label>
+            <p class="hint" id="justificacion-hint">Al menos 20 caracteres. Queda en el historial de la solicitud.</p>
+            <textarea id="cambio-justificacion" maxlength="1000" aria-describedby="justificacion-hint"></textarea>
+            <p class="error" id="ec-justificacion"></p>
+          </div>
+
+          <div class="acciones-dictamen">
+            <button type="button" class="btn btn-secondary" id="btn-cancelar-cambio">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-cambio">Guardar cambio</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- HU-06.4, criterio 5: todos los dictámenes, del más reciente al más antiguo -->
+      <div class="dictamen-historial" id="dictamen-historial" hidden>
+        <h3>Historial de dictámenes</h3>
+        <ol id="dh-lista"></ol>
       </div>
 
       <!-- Sin dictamen todavía -->

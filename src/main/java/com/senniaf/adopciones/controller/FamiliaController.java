@@ -103,6 +103,17 @@ public class FamiliaController {
                                  "permitidos", List.of("REGISTRADA", "EN_EVALUACION", "CERRADA")));
         }
 
+        // Sprint 7: Idonea y No idonea los pone el dictamen, no una persona.
+        if (nuevo.esDeDictamen()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Ese estado lo asigna el dictamen de idoneidad; no se elige a mano.",
+                                 "permitidos", List.of("REGISTRADA", "EN_EVALUACION", "CERRADA")));
+        }
+        String rechazo = servicio.rechazoCambioManual(encontrada.get(), nuevo);
+        if (rechazo != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", rechazo));
+        }
+
         return ResponseEntity.ok(servicio.aDetalle(
                 servicio.cambiarEstado(encontrada.get(), nuevo, usuario)));
     }

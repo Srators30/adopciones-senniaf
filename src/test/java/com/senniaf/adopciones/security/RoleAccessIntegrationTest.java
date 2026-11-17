@@ -20,7 +20,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * usuarios de prueba admin / tecnico1 / juez1) y verifican login + control
  * de acceso por rol contra endpoints reales via MockMvc.
  */
-@SpringBootTest
+@SpringBootTest(properties = {
+        // Sprint 7: base en memoria, igual que FamiliaApiIntegrationTest.
+        // Asi las pruebas no tocan la carpeta data ni chocan con la
+        // aplicacion si esta corriendo al mismo tiempo. Con las mismas
+        // propiedades, las dos clases comparten un solo arranque de Spring.
+        "spring.datasource.url=jdbc:h2:mem:pruebas_api_familias;DB_CLOSE_DELAY=-1",
+        "app.documentos.ruta=./target/documentos-prueba"
+})
 @AutoConfigureMockMvc
 class RoleAccessIntegrationTest {
 
