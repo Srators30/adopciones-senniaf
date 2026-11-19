@@ -99,6 +99,13 @@ public class ExpedienteController {
                                  "permitidos", List.of("REGISTRADO", "EN_REVISION", "CERRADO")));
         }
 
+        // Sprint 8 (decision del PO): un expediente cerrado solo lo reabre el
+        // Administrador, con motivo (POST /api/admin/expedientes/{n}/reapertura).
+        if (encontrado.get().getEstado() == EstadoExpediente.CERRADO && nuevo != EstadoExpediente.CERRADO) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", "Un expediente cerrado solo lo puede reabrir el Administrador, indicando el motivo."));
+        }
+
         return ResponseEntity.ok(servicio.aDetalle(
                 servicio.cambiarEstado(encontrado.get(), nuevo, usuario)));
     }

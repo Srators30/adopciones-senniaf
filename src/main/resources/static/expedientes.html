@@ -62,6 +62,18 @@
         <option value="CERRADO">Cerrado</option>
       </select>
     </div>
+    <!-- Sprint 8 · HU-07.1: filtro por etapa jurídica -->
+    <div class="field">
+      <label for="etapa">Etapa jurídica</label>
+      <select id="etapa" name="etapa">
+        <option value="">Todas</option>
+        <option value="EN_PROTECCION">En protección</option>
+        <option value="EN_PROCESO_JUDICIAL">En proceso judicial</option>
+        <option value="DECLARADO_ADOPTABLE">Declarado adoptable</option>
+        <option value="ADOPTADO">Adoptado</option>
+        <option value="REINTEGRADO">Reintegrado a su familia</option>
+      </select>
+    </div>
     <div class="field">
       <label for="modalidad">Modalidad de acogida</label>
       <select id="modalidad" name="modalidad">
@@ -96,6 +108,7 @@
           <th scope="col">Edad</th>
           <th scope="col">Modalidad</th>
           <th scope="col">Estado</th>
+          <th scope="col">Etapa jurídica</th>
           <th scope="col">Registrado</th>
         </tr>
       </thead>

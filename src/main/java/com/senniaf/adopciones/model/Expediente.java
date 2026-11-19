@@ -42,6 +42,26 @@ public class Expediente {
     @Column(nullable = false, length = 20)
     private EstadoExpediente estado = EstadoExpediente.REGISTRADO;
 
+    // ---------------- Sprint 8 · HU-07 estado juridico ----------------
+    // La columna admite nulos solo para que Hibernate pueda agregarla a una
+    // base que ya tiene expedientes; al arrancar, TareasExpedientes pone
+    // En proteccion a los que no tengan etapa (HU-07.1, criterio 2).
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_juridico", length = 30)
+    private EstadoJuridico estadoJuridico = EstadoJuridico.EN_PROTECCION;
+
+    /** Cuando cambio la etapa por ultima vez. */
+    @Column(name = "fecha_estado_juridico")
+    private LocalDateTime fechaEstadoJuridico;
+
+    /**
+     * Si el expediente lo cerro el sistema por inactividad en etapa final
+     * (decision del PO, Sprint 8), cuando fue. Se vacia al reabrirlo.
+     */
+    @Column(name = "fecha_cierre_automatico")
+    private LocalDateTime fechaCierreAutomatico;
+
     // ---------------- 1. Datos del menor ----------------
     @Column(nullable = false, length = 80)
     private String nombres;
@@ -159,6 +179,17 @@ public class Expediente {
 
     public EstadoExpediente getEstado() { return estado; }
     public void setEstado(EstadoExpediente estado) { this.estado = estado; }
+
+    public EstadoJuridico getEstadoJuridico() {
+        return estadoJuridico == null ? EstadoJuridico.EN_PROTECCION : estadoJuridico;
+    }
+    public void setEstadoJuridico(EstadoJuridico estadoJuridico) { this.estadoJuridico = estadoJuridico; }
+
+    public LocalDateTime getFechaEstadoJuridico() { return fechaEstadoJuridico; }
+    public void setFechaEstadoJuridico(LocalDateTime fechaEstadoJuridico) { this.fechaEstadoJuridico = fechaEstadoJuridico; }
+
+    public LocalDateTime getFechaCierreAutomatico() { return fechaCierreAutomatico; }
+    public void setFechaCierreAutomatico(LocalDateTime fechaCierreAutomatico) { this.fechaCierreAutomatico = fechaCierreAutomatico; }
 
     public String getNombres() { return nombres; }
     public void setNombres(String nombres) { this.nombres = nombres; }

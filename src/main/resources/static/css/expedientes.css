@@ -123,3 +123,49 @@ dl.datos dd.vacia { color: var(--muted); font-style: italic; }
   .historial li { grid-template-columns: 1fr; gap: 6px; }
   .historial .tipo { justify-self: start; }
 }
+
+/* ===================== Sprint 8 · HU-07 y cierres automáticos ===================== */
+
+/* Etapa jurídica: una sola familia de color (verde-azulado) para no
+   confundirla con el estado administrativo; las finales, más sólidas. */
+.pill.etapa { background: #E3F1F1; color: #1C5B5C; }
+.pill.etapa.en_proceso_judicial { background: #E6ECF8; color: #24407A; }
+.pill.etapa.declarado_adoptable { background: #E4F3EC; color: #1F6F54; }
+.pill.etapa.adoptado { background: #1F6F54; color: #fff; }
+.pill.etapa.reintegrado { background: #1C5B5C; color: #fff; }
+.tipo.estado_juridico { background: #E3F1F1; color: #1C5B5C; }
+
+/* La cabecera de la ficha suma "Etapa jurídica": cinco datos por fila */
+@media (min-width: 901px) {
+  .cabecera-exp { grid-template-columns: repeat(5, 1fr); }
+}
+/* El filtro suma "Etapa jurídica" */
+.filtros { grid-template-columns: 2fr 1fr 1fr 1fr auto; }
+@media (max-width: 900px) { .filtros { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .filtros { grid-template-columns: 1fr; } }
+
+/* Aviso del cierre automático en la ficha */
+.nota-cierre {
+  margin: -8px 0 20px; padding: 12px 16px; border-radius: 8px;
+  background: #FFF8E6; border: 1px solid #F0D9A0; color: #6B4A00; font-size: .9375rem;
+}
+.nota-cierre.urgente { background: #FCEDEC; border-color: #F2C4C0; color: #8C2A22; }
+.nota-cierre.cerrado { background: #EDEFF3; border-color: #D5DAE3; color: #3B475C; }
+
+/* Bloque de la etapa jurídica (Juez) y reapertura (Administrador) */
+.etapa-juridica > .hint, .reapertura > .hint { margin: -6px 0 14px; color: var(--muted); font-size: .9375rem; }
+.nota-etapa { margin: 0; padding: 12px 16px; border-radius: 8px; background: var(--paper); color: #3B475C; }
+.etapa-juridica textarea, .reapertura textarea { width: 100%; min-height: 96px; }
+.etapa-juridica select { max-width: 360px; }
+.acciones-form { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; margin-top: 8px; }
+.reapertura { margin-bottom: 18px; }
+.field.invalid textarea, .field.invalid select { border-color: #B3261E; }
+.field .error { color: #B3261E; font-size: .875rem; margin: 4px 0 0; min-height: 0; }
+.field .error:empty { display: none; }
+
+/* Sección Cierres automáticos */
+.titulo-seccion { margin: 28px 0 4px; font: 700 1.25rem var(--font-head); color: var(--ink); }
+.cierres td.urgente { color: #8C2A22; font-weight: 700; }
+.etapa-juridica textarea, .reapertura textarea {
+  font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; resize: vertical;
+}

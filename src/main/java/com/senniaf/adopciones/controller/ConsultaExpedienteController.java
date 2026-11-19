@@ -2,6 +2,7 @@ package com.senniaf.adopciones.controller;
 
 import com.senniaf.adopciones.model.Expediente;
 import com.senniaf.adopciones.model.Usuario;
+import com.senniaf.adopciones.service.CierreAutomaticoService;
 import com.senniaf.adopciones.service.ExpedienteService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +32,11 @@ import java.util.Optional;
 public class ConsultaExpedienteController {
 
     private final ExpedienteService servicio;
+    private final CierreAutomaticoService cierres;
 
-    public ConsultaExpedienteController(ExpedienteService servicio) {
+    public ConsultaExpedienteController(ExpedienteService servicio, CierreAutomaticoService cierres) {
         this.servicio = servicio;
+        this.cierres = cierres;
     }
 
     /**
@@ -41,15 +44,18 @@ public class ConsultaExpedienteController {
      *   q          texto libre (nombres, apellidos, numero o documento)
      *   estado     REGISTRADO | EN_REVISION | CERRADO
      *   modalidad  centro_acogimiento | familia_acogida | ...
+     *   etapa      EN_PROTECCION | EN_PROCESO_JUDICIAL | DECLARADO_ADOPTABLE |
+     *              ADOPTADO | REINTEGRADO   (Sprint 8, HU-07.1)
      */
     @GetMapping
     public Map<String, Object> listar(@RequestParam(required = false) String q,
                                        @RequestParam(required = false) String estado,
                                        @RequestParam(required = false) String modalidad,
+                                       @RequestParam(required = false) String etapa,
                                        @RequestParam(defaultValue = "0") int pagina,
                                        @RequestParam(defaultValue = "10") int tamano) {
 
-        Page<Expediente> resultado = servicio.buscar(q, estado, modalidad, pagina, tamano);
+        Page<Expediente> resultado = servicio.buscar(q, estado, modalidad, etapa, pagina, tamano);
 
         List<Map<String, Object>> filas = resultado.getContent().stream()
                 .map(servicio::aResumen)
@@ -69,7 +75,12 @@ public class ConsultaExpedienteController {
     public ResponseEntity<Map<String, Object>> detalle(@PathVariable String numero,
                                                         @AuthenticationPrincipal Usuario usuario) {
         return servicio.verDetalle(numero, usuario)
-                .map(e -> ResponseEntity.ok(servicio.aDetalle(e)))
+                .map(e -> {
+                    Map<String, Object> m = servicio.aDetalle(e);
+                    // Sprint 8: dias para el cierre automatico, si le corre el plazo.
+                    m.put("cierreAutomatico", cierres.estadoEn(e));
+                    return ResponseEntity.ok(m);
+                })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

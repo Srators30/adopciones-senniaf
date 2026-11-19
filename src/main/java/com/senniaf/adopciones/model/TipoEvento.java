@@ -14,5 +14,6 @@ public enum TipoEvento {
     CONSULTA,
     CAMBIO_ESTADO,
     DOCUMENTO,     // HU-04: adjuntar o descargar un documento
-    DICTAMEN       // HU-06.1: dictamen de idoneidad de una familia
+    DICTAMEN,      // HU-06.1: dictamen de idoneidad de una familia
+    ESTADO_JURIDICO // HU-07.2: el Juez cambio la etapa juridica del menor
 }

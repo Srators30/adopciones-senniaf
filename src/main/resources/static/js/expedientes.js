@@ -77,6 +77,14 @@
     tdEstado.appendChild(pill);
     tr.appendChild(tdEstado);
 
+    // Sprint 8 · HU-07.1: etapa jurídica, independiente del estado administrativo.
+    const tdEtapa = document.createElement('td');
+    const etapa = document.createElement('span');
+    etapa.className = 'pill etapa ' + String(exp.estadoJuridico || '').toLowerCase();
+    etapa.textContent = exp.estadoJuridicoEtiqueta || exp.estadoJuridico || '—';
+    tdEtapa.appendChild(etapa);
+    tr.appendChild(tdEtapa);
+
     tr.appendChild(celda((exp.fechaCreacion || '').slice(0, 10) + ' · ' + exp.creadoPor));
     return tr;
   }
@@ -89,6 +97,7 @@
       q: form.q.value.trim(),
       estado: form.estado.value,
       modalidad: form.modalidad.value,
+      etapa: form.etapa.value,          // Sprint 8 · HU-07.1
       pagina: String(pagina),
       tamano: String(TAMANO)
     });

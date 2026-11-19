@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Cierres automáticos | SENNIAF</title>
+
+<!--
+  =====================================================================
+  SENNIAF · Cierres automáticos de expedientes (Sprint 8, decisión del PO)
+  Datos de GET /api/tecnico/expedientes/cierres-automaticos: solo
+  Administrador y Técnico. Muestra los expedientes en etapa final que se
+  cerrarán solos si nadie los trabaja, y los que ya cerró el sistema.
+  =====================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/expedientes.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">SENNIAF <small>Sistema de gestión de adopciones</small></div>
+    <div class="user">
+      <strong id="sesion-nombre">—</strong>
+      <span><span id="sesion-rol">—</span> · <a href="#" id="btn-salir" style="color:inherit">Cerrar sesión</a></span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="page-head">
+    <div>
+      <h1>Cierres automáticos</h1>
+      <p>Expedientes en etapa final que se cerrarán solos si nadie los trabaja, y los que ya cerró el sistema.</p>
+    </div>
+    <a class="btn btn-secondary" href="expedientes.html">Ver todos los expedientes</a>
+  </div>
+
+  <div class="banner banner-info" role="note">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B4B9B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    <span id="regla">Un expediente se cierra solo cuando el menor está en una etapa final (Adoptado o Reintegrado a su familia) y nadie lo ha trabajado en los últimos días. Cualquier cambio, documento o actualización reinicia el plazo; abrir la ficha para mirarla no.</span>
+  </div>
+
+  <div class="banner banner-error" role="alert" id="banner-error" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+    <span id="banner-error-text"></span>
+  </div>
+
+  <h2 class="titulo-seccion">Por cerrarse</h2>
+  <p class="resumen-resultados"><span id="resumen-por">Cargando…</span></p>
+  <div class="tabla-envoltura">
+    <table class="expedientes cierres">
+      <caption style="position:absolute;left:-9999px">Expedientes que se cerrarán automáticamente</caption>
+      <thead>
+        <tr>
+          <th scope="col">N.º expediente</th>
+          <th scope="col">Menor</th>
+          <th scope="col">Etapa jurídica</th>
+          <th scope="col">Última actividad</th>
+          <th scope="col">Se cierra</th>
+        </tr>
+      </thead>
+      <tbody id="filas-por"></tbody>
+    </table>
+    <div class="vacio" id="vacio-por" hidden>
+      <strong>Ningún expediente está por cerrarse</strong>
+      Aparecen aquí cuando el menor llega a Adoptado o Reintegrado a su familia.
+    </div>
+  </div>
+
+  <h2 class="titulo-seccion">Cerrados automáticamente</h2>
+  <p class="resumen-resultados"><span id="resumen-cerrados">Cargando…</span></p>
+  <div class="tabla-envoltura">
+    <table class="expedientes cierres">
+      <caption style="position:absolute;left:-9999px">Expedientes cerrados por el sistema</caption>
+      <thead>
+        <tr>
+          <th scope="col">N.º expediente</th>
+          <th scope="col">Menor</th>
+          <th scope="col">Etapa jurídica</th>
+          <th scope="col">Cerrado el</th>
+        </tr>
+      </thead>
+      <tbody id="filas-cerrados"></tbody>
+    </table>
+    <div class="vacio" id="vacio-cerrados" hidden>
+      <strong>El sistema no ha cerrado ningún expediente</strong>
+      Si cierra uno que no debía, ábrelo y el Administrador lo puede reabrir con motivo.
+    </div>
+  </div>
+</main>
+
+<script src="js/sesion.js"></script>
+<script src="js/cierres-automaticos.js"></script>
+<script src="js/volver-arriba.js"></script>
+</body>
+</html>

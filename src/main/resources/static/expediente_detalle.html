@@ -51,7 +51,24 @@
       </select>
       <button type="button" class="btn btn-secondary" id="btn-estado">Actualizar</button>
     </div>
+    <!-- Sprint 8: solo el Administrador reabre un expediente cerrado -->
+    <button type="button" class="btn btn-secondary" id="btn-abrir-reapertura" hidden>Reabrir expediente</button>
   </div>
+
+  <form class="bloque reapertura" id="form-reapertura" novalidate hidden>
+    <h2>Reabrir expediente</h2>
+    <p class="hint">Volverá al estado En revisión. La reapertura y su motivo quedan en el historial.</p>
+    <div class="field">
+      <label for="motivo-reapertura">Motivo de la reapertura <span class="req" aria-hidden="true">*</span></label>
+      <p class="hint" id="motivo-hint">Al menos 20 caracteres.</p>
+      <textarea id="motivo-reapertura" maxlength="1000" aria-describedby="motivo-hint"></textarea>
+      <p class="error" id="e-motivo"></p>
+    </div>
+    <div class="acciones-form">
+      <button type="button" class="btn btn-secondary" id="btn-cancelar-reapertura">Cancelar</button>
+      <button type="submit" class="btn btn-primary" id="btn-reabrir">Reabrir expediente</button>
+    </div>
+  </form>
 
   <div class="banner banner-info" role="status" id="banner-ok" hidden>
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B4B9B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
@@ -66,9 +83,37 @@
     <dl class="cabecera-exp" aria-label="Datos asignados por el sistema">
       <div><dt>N.º de expediente</dt><dd id="c-numero">—</dd></div>
       <div><dt>Estado</dt><dd id="c-estado">—</dd></div>
+      <div><dt>Etapa jurídica</dt><dd id="c-etapa">—</dd></div>
       <div><dt>Fecha de creación</dt><dd id="c-creacion">—</dd></div>
       <div><dt>Responsable</dt><dd id="c-responsable">—</dd></div>
     </dl>
+
+    <!-- Sprint 8: aviso del cierre automático -->
+    <p class="nota-cierre" id="nota-cierre" role="status" hidden></p>
+
+    <!-- ============ Sprint 8 · HU-07.2 · Etapa jurídica (solo Juez) ============ -->
+    <section class="bloque etapa-juridica" id="bloque-etapa" aria-labelledby="t-etapa" hidden>
+      <h2 id="t-etapa">Etapa jurídica</h2>
+      <p class="hint">Solo avanza: En protección → En proceso judicial → Declarado adoptable o Reintegrado; Declarado adoptable → Adoptado. El cambio queda en el historial.</p>
+      <p class="nota-etapa" id="etapa-nota" hidden></p>
+
+      <form id="form-etapa" novalidate hidden>
+        <div class="field">
+          <label for="nueva-etapa">Nueva etapa <span class="req" aria-hidden="true">*</span></label>
+          <select id="nueva-etapa"></select>
+          <p class="error" id="e-etapa"></p>
+        </div>
+        <div class="field">
+          <label for="obs-etapa">Observación <span class="req" aria-hidden="true">*</span></label>
+          <p class="hint" id="obs-hint">Qué se decidió y en qué se basa. Al menos 20 caracteres.</p>
+          <textarea id="obs-etapa" maxlength="1000" aria-describedby="obs-hint"></textarea>
+          <p class="error" id="e-observacion"></p>
+        </div>
+        <div class="acciones-form">
+          <button type="submit" class="btn btn-primary" id="btn-etapa">Cambiar etapa</button>
+        </div>
+      </form>
+    </section>
 
     <section class="bloque" aria-labelledby="t1">
       <h2 id="t1">Datos del menor</h2>
@@ -147,6 +192,7 @@
 
 <script src="js/sesion.js"></script>
 <script src="js/expediente-detalle.js"></script>
+<script src="js/etapa-juridica.js"></script>
 <script src="js/documentos.js"></script>
 <!-- Sprint 7: enlace "Volver al inicio" en el encabezado y botón "Volver arriba" -->
 <script src="js/volver-arriba.js"></script>

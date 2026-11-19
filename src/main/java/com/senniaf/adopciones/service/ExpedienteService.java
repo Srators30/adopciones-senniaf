@@ -1,6 +1,7 @@
 package com.senniaf.adopciones.service;
 
 import com.senniaf.adopciones.model.EstadoExpediente;
+import com.senniaf.adopciones.model.EstadoJuridico;
 import com.senniaf.adopciones.model.EventoExpediente;
 import com.senniaf.adopciones.model.Expediente;
 import com.senniaf.adopciones.model.TipoEvento;
@@ -64,6 +65,9 @@ public class ExpedienteService {
 
         e.setEstado(EstadoExpediente.REGISTRADO);
         e.setFechaCreacion(LocalDateTime.now());
+        // HU-07.1, criterio 2: todo expediente nuevo arranca En proteccion.
+        e.setEstadoJuridico(EstadoJuridico.EN_PROTECCION);
+        e.setFechaEstadoJuridico(e.getFechaCreacion());
         e.setCreadoPor(usuario.getUsername());
 
         // Se guarda primero para que la base asigne el id, y con ese id se
@@ -85,6 +89,13 @@ public class ExpedienteService {
     @Transactional(readOnly = true)
     public Page<Expediente> buscar(String texto, String estado, String modalidad,
                                     int pagina, int tamano) {
+        return buscar(texto, estado, modalidad, null, pagina, tamano);
+    }
+
+    /** Sprint 8: tambien filtra por etapa juridica (HU-07.1, criterio 3). */
+    @Transactional(readOnly = true)
+    public Page<Expediente> buscar(String texto, String estado, String modalidad, String etapa,
+                                    int pagina, int tamano) {
         String patron = (texto == null || texto.isBlank())
                 ? null
                 : "%" + texto.trim().toLowerCase() + "%";
@@ -100,7 +111,16 @@ public class ExpedienteService {
 
         String modalidadFiltro = (modalidad == null || modalidad.isBlank()) ? null : modalidad.trim();
 
-        return expedientes.buscar(patron, estadoFiltro, modalidadFiltro,
+        EstadoJuridico etapaFiltro = null;
+        if (etapa != null && !etapa.isBlank()) {
+            try {
+                etapaFiltro = EstadoJuridico.valueOf(etapa.trim().toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                etapaFiltro = null;   // una etapa desconocida no filtra nada
+            }
+        }
+
+        return expedientes.buscar(patron, estadoFiltro, modalidadFiltro, etapaFiltro,
                 PageRequest.of(Math.max(pagina, 0), Math.min(Math.max(tamano, 1), 50),
                         Sort.by(Sort.Direction.DESC, "fechaCreacion")));
     }
@@ -181,6 +201,11 @@ public class ExpedienteService {
     public void registrar(Expediente e, TipoEvento tipo, String descripcion, Usuario usuario) {
         eventos.save(new EventoExpediente(e, tipo, descripcion,
                 usuario.getUsername(), usuario.getRol().name()));
+    }
+
+    /** Para lo que hace el propio sistema, como el cierre automatico (Sprint 8). */
+    public void registrar(Expediente e, TipoEvento tipo, String descripcion, String usuario, String rol) {
+        eventos.save(new EventoExpediente(e, tipo, descripcion, usuario, rol));
     }
 
     // =====================================================================
@@ -314,6 +339,9 @@ public class ExpedienteService {
         m.put("sexo", nn(e.getSexo()));
         m.put("edad", edad(e.getFechaNacimiento()));
         m.put("estado", e.getEstado().name());
+        // Sprint 8 · HU-07.1: la etapa juridica va en el listado y en la ficha.
+        m.put("estadoJuridico", e.getEstadoJuridico().name());
+        m.put("estadoJuridicoEtiqueta", e.getEstadoJuridico().getEtiqueta());
         m.put("modalidadAcogida", nn(e.getModalidadAcogida()));
         m.put("fechaIngreso", nn(e.getFechaIngreso()));
         m.put("fechaCreacion", e.getFechaCreacion() == null ? "" : e.getFechaCreacion().format(FECHA_HORA));
@@ -346,6 +374,11 @@ public class ExpedienteService {
         m.put("puebloIndigena", nn(e.getPuebloIndigena()));
         m.put("fechaActualizacion", e.getFechaActualizacion() == null ? "" : e.getFechaActualizacion().format(FECHA_HORA));
         m.put("actualizadoPor", nn(e.getActualizadoPor()));
+        // Sprint 8
+        m.put("fechaEstadoJuridico", e.getFechaEstadoJuridico() == null ? "" : e.getFechaEstadoJuridico().format(FECHA_HORA));
+        m.put("etapaFinal", e.getEstadoJuridico().esFinal());
+        m.put("siguientesEtapas", e.getEstadoJuridico().siguientes().stream().map(Enum::name).toList());
+        m.put("fechaCierreAutomatico", e.getFechaCierreAutomatico() == null ? "" : e.getFechaCierreAutomatico().format(FECHA_HORA));
         return m;
     }
 

@@ -18,9 +18,13 @@
   const ETIQUETA_ESTADO = { REGISTRADO: 'Registrado', EN_REVISION: 'En revisión', CERRADO: 'Cerrado' };
   const ETIQUETA_TIPO = {
     CREACION: 'Creación', MODIFICACION: 'Modificación', CONSULTA: 'Consulta',
-    CAMBIO_ESTADO: 'Estado', DOCUMENTO: 'Documento'
+    CAMBIO_ESTADO: 'Estado', DOCUMENTO: 'Documento',
+    ESTADO_JURIDICO: 'Etapa jurídica'          // Sprint 8 · HU-07.2
   };
-  const ETIQUETA_ROL = { ADMINISTRADOR: 'Administrador', TECNICO: 'Técnico/Trabajador', JUEZ: 'Juez' };
+  const ETIQUETA_ROL = {
+    ADMINISTRADOR: 'Administrador', TECNICO: 'Técnico/Trabajador', JUEZ: 'Juez',
+    SISTEMA: 'automático'                      // Sprint 8: cierre automático
+  };
 
   /* Traducciones de los valores que el formulario guarda en clave */
   const DICCIONARIO = {
@@ -75,6 +79,32 @@
     pill.textContent = ETIQUETA_ESTADO[e.estado] || e.estado;
     estado.appendChild(pill);
 
+    // Sprint 8 · HU-07.1: etapa jurídica en la cabecera.
+    const etapa = document.getElementById('c-etapa');
+    etapa.replaceChildren();
+    const pillEtapa = document.createElement('span');
+    pillEtapa.className = 'pill etapa ' + String(e.estadoJuridico || '').toLowerCase();
+    pillEtapa.textContent = e.estadoJuridicoEtiqueta || e.estadoJuridico;
+    etapa.appendChild(pillEtapa);
+
+    // Sprint 8: aviso del cierre automático.
+    const nota = document.getElementById('nota-cierre');
+    const cierre = e.cierreAutomatico || {};
+    nota.hidden = true;
+    if (e.fechaCierreAutomatico) {
+      nota.textContent = 'Cerrado automáticamente el ' + e.fechaCierreAutomatico.slice(0, 16) +
+        ' tras ' + cierre.plazoDias + ' días sin actividad en etapa final. Si no debía cerrarse, el Administrador puede reabrirlo.';
+      nota.className = 'nota-cierre cerrado';
+      nota.hidden = false;
+    } else if (cierre.fechaLimite) {
+      const d = cierre.diasRestantes;
+      nota.textContent = 'Este expediente está en etapa final: se cerrará automáticamente ' +
+        (d === 0 ? 'hoy' : 'en ' + d + (d === 1 ? ' día' : ' días')) + ' (' + cierre.fechaLimite +
+        ') si nadie lo trabaja. Cualquier cambio, documento o actualización reinicia el plazo.';
+      nota.className = 'nota-cierre' + (d <= 2 ? ' urgente' : '');
+      nota.hidden = false;
+    }
+
     const menor = document.getElementById('d-menor');
     menor.replaceChildren();
     dato(menor, 'Nombres', e.nombreCompleto);
@@ -118,8 +148,13 @@
       document.getElementById('nuevo-estado').value = e.estado;
       caja.hidden = false;
     }
+    /* Sprint 8: un expediente cerrado solo lo reabre el Administrador */
+    document.getElementById('btn-abrir-reapertura').hidden =
+      !(sesion.rol === 'ADMINISTRADOR' && e.estado === 'CERRADO');
 
     contenido.hidden = false;
+    // etapa-juridica.js arma el bloque del Juez con estos mismos datos.
+    document.dispatchEvent(new CustomEvent('expediente:cargado', { detail: e }));
   }
 
   function pintarHistorial(eventos) {
@@ -187,7 +222,11 @@
       });
 
       if (r.status === 403) { fallar('Tu rol no puede cambiar el estado del expediente.'); return; }
-      if (!r.ok) { fallar('No se pudo cambiar el estado (' + r.status + ').'); return; }
+      if (!r.ok) {
+        const detalle = await r.json().catch(() => ({}));
+        fallar(detalle.error || 'No se pudo cambiar el estado (' + r.status + ').');
+        return;
+      }
 
       textoOk.textContent = 'Estado actualizado a ' + (ETIQUETA_ESTADO[nuevo] || nuevo) + '.';
       bannerOk.hidden = false;
